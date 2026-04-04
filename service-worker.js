@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "hhc-hymn-cache-v1";
+const CACHE_NAME = "20260405";
 const urlsToCache = [
   "./kashi.html",
   "./manifest.json",
