@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "20260405";
+const CACHE_NAME = "20260406";
 const urlsToCache = [
   "./kashi.html",
   "./manifest.json",
