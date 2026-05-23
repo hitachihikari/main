@@ -398,11 +398,12 @@
 
 				<div class="controls mb-2">
 					<strong>難易度：</strong>
-					<label><input type="radio" name="level" value="0"> やさしい</label>
-					<label><input type="radio" name="level" value="0.4" checked> ふつう</label>
-					<label><input type="radio" name="level" value="0.8"> むずかしい</label>
-					<label><input type="radio" name="level" value="1.0"> 超むず</label>
-				</div>
+	<label><input type="radio" name="level" value="auto" checked> 自動</label>
+	<label><input type="radio" name="level" value="0"> やさしい</label>
+	<label><input type="radio" name="level" value="0.4"> ふつう</label>
+	<label><input type="radio" name="level" value="0.8"> むずかしい</label>
+	<label><input type="radio" name="level" value="1.0"> 超むず</label>
+</div>
 				<div class="mb-2">
 					<strong>文字サイズ：</strong>
 					<button class="btn btn-outline-secondary btn-sm" id="fontMinus">－</button>
@@ -557,6 +558,41 @@
 					return parseFloat(document.querySelector('input[name="level"]:checked').value);
 				}
 
+				// 日曜12:00を0.0(全表示)として、1週間かけて1.0(全非表示)へ徐々に上げる計算
+function getAutoLevel() {
+	const now = new Date();
+	const day = now.getDay(); // 0:日曜, 1:月曜...6:土曜
+	const hours = now.getHours();
+	const minutes = now.getMinutes();
+
+	let hoursSinceSundayNoon = 0;
+
+	if (day === 0) {
+		if (hours >= 12) {
+			// 今週の日曜午後（12:00以降）
+			hoursSinceSundayNoon = (hours - 12) + (minutes / 60);
+		} else {
+			// 今週の日曜午前（先週の日曜12:00から6日と12時間経過）
+			hoursSinceSundayNoon = 6 * 24 + 12 + hours + (minutes / 60);
+		}
+	} else {
+		// 月曜〜土曜
+		hoursSinceSundayNoon = 12 + (day - 1) * 24 + hours + (minutes / 60);
+	}
+
+	// 1週間(168時間)で 0.0 から 1.0 になる割合を計算
+	return Math.min(Math.max(hoursSinceSundayNoon / 168, 0), 1.0);
+}
+
+// 選択された難易度を取得する関数
+function getCurrentLevel() {
+	const val = document.querySelector('input[name="level"]:checked').value;
+	if (val === "auto") {
+		return getAutoLevel();
+	}
+	return parseFloat(val);
+}
+				
 				// 難易度変更時の更新
 				function updateVerse(percent) {
 					if (!currentVerse) return;
@@ -571,12 +607,12 @@
 				}
 
 				document.querySelectorAll('input[name="level"]').forEach(radio => {
-					radio.addEventListener("change", e => {
-						if (currentVerse) {
-							updateVerse(parseFloat(e.target.value));
-						}
-					});
-				});
+	radio.addEventListener("change", () => {
+		if (currentVerse) {
+			updateVerse(getCurrentLevel());
+		}
+	});
+});
 
 				let currentFontSize = 40;  // 初期フォントサイズ（px）
 				applyFontSize();
