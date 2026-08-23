@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教会学校交わり会 進行用スライド</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  #slide-container {
+    width: 100vw;
+    height: 56.25vw;
+    max-height: 100vh;
+    max-width: 177.78vh;
+    position: relative;
+    background: #1e293b;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+  .slide {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 2vw 3vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .slide.active { display: flex; }
+  
+  /* スタイル要素 */
+  .badge {
+    background: #eab308;
+    color: #000;
+    font-weight: 900;
+    font-size: 3.2vw;
+    padding: 0.8vw 2vw;
+    border-radius: 50px;
+    margin-bottom: 1.5vw;
+    display: inline-block;
+  }
+  .title {
+    font-size: 6.5vw;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 1vw;
+    color: #f8fafc;
+  }
+  .title-highlight { color: #38bdf8; }
+  .title-gold { color: #facc15; }
+  .subtitle {
+    font-size: 3.5vw;
+    color: #94a3b8;
+    margin-bottom: 1.5vw;
+  }
+  .content-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5vw;
+    padding: 2.5vw;
+    width: 96%;
+    text-align: left;
+  }
+  .list-item {
+    font-size: 3.6vw;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1vw;
+    list-style: none;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5vw;
+    width: 96%;
+  }
+  .stat-card {
+    background: #334155;
+    padding: 1.5vw;
+    border-radius: 1vw;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 6.5vw;
+    font-weight: 900;
+    color: #38bdf8;
+  }
+  .stat-label {
+    font-size: 3vw;
+    color: #cbd5e1;
+  }
+  
+  /* YouTubeタイマー枠 */
+  .timer-wrapper {
+    width: 85%;
+    max-width: 1000px;
+    aspect-ratio: 16 / 9;
+    border-radius: 1.5vw;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+  }
+  .timer-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* 操作ナビゲーションとページ番号（小さく調整） */
+  .nav-btn {
+    position: absolute;
+    bottom: 1.5vw;
+    background: rgba(255,255,255,0.1); /* 少し透過を下げる */
+    color: rgba(255,255,255,0.6);
+    border: none;
+    font-size: 1.5vw; /* 小さく */
+    padding: 0.6vw 1.2vw;
+    border-radius: 0.5vw;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .nav-btn:hover {
+    background: rgba(255,255,255,0.3);
+    color: white;
+  }
+  .prev-btn { left: 2vw; }
+  .next-btn { right: 2vw; }
+  
+  /* ページ番号（小さく調整） */
+  .counter {
+    position: absolute;
+    bottom: 2vw;
+    right: 10vw;
+    font-size: 1.5vw; /* 小さく */
+    font-weight: normal;
+    color: #64748b;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<div id="slide-container">
+
+  <!-- ================= 1ページ目 ================= -->
+  <div class="slide active">
+    <div class="badge">教会学校交わり会</div>
+    <div class="title title-gold">"ひとりひとりは<br>「各器官」なのです" ゲーム</div>
+  </div>
+
+  <!-- ================= 2ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">今日のテーマ</div>
+    <div class="title">3つの試練に挑む</div>
+    <div class="content-box">
+      <div class="list-item" style="text-align: center;">
+        🔹 チームで協力して<br>一人ひとり違う"得意"を活かし合い、<br>楽しみながら試練をクリアする！
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">本日のスケジュール（計90分）</div>
+    <div class="content-box">
+      <div class="list-item">⏱ 00〜05分：オープニング・ルール説明</div>
+      <div class="list-item">⏱ 05〜30分：第1の試練（ブリッジ・25分）</div>
+      <div class="list-item">⏱ 30〜55分：第2の試練（ドロー・25分）</div>
+      <div class="list-item">⏱ 55〜80分：第3の試練（タワー・25分）</div>
+      <div class="list-item">⏱ 80〜90分：表彰式・大まとめ・祈り（10分）</div>
+    </div>
+  </div>
+
+  <!-- ================= 4ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">得点ルール</div>
+    <div class="title">チーム対抗ポイント制！</div>
+    <div class="content-box">
+      <div class="list-item">🥇 １位： ３０ ポイント</div>
+      <div class="list-item">🥈 ２位： ２０ ポイント</div>
+      <div class="list-item">🥉 ３位： １０ ポイント</div>
+      <div class="list-item" style="text-align: center; color: #facc15; margin-top: 1.5vw;">
+        全ゲーム終了後、総合優勝チームには景品が！？
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">第1の試練</div>
+    <div class="title title-highlight">ブリッジ</div>
+    <div class="subtitle">〜 紙片の架け橋 〜</div>
+    <div class="subtitle" style="font-size: 3vw; margin-top: 1vw;">制限時間：15分間</div>
+  </div>
+
+  <!-- ================= 6ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ブリッジ：ルール</div>
+    <div class="content-box">
+      <div class="list-item" style="color: #eab308; margin-bottom: 1.5vw;">【進行】ルール説明 ➡ ブリッジづくり ➡ 強度測定</div>
+      <div class="list-item">📦 A4用紙とテープで橋を作り、ペットボトルを何本載せられるか競う！</div>
+      <div class="list-item">🛠 使う道具：A4用紙、テープ、ハサミ</div>
+      <div class="list-item">⏱ 制限時間：15分（「用意、スタート！」で開始）</div>
+      <div class="list-item">🚫 制作途中のペットボトルの試し載せは禁止</div>
+    </div>
+  </div>
+
+  <!-- ================= 7ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ブリッジ：制作タイム</div>
+    <div class="title" style="font-size:5vw; margin-bottom:1vw;">カウントダウンスタート！</div>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/BuKAtgIpPEA?si=SlchCdCVZ-E7GJIG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    
+  </div>
+
+  <!-- ================= 8ページ目 ================= -->
+  <div class="slide">
+    <div class="title" style="font-size: 12vw; color: #f87171; font-weight: 900;">終了！</div>
+    <div class="subtitle" style="font-size: 5.5vw; color: #ffffff;">手を止めてください</div>
+  </div>
+
+  <!-- ================= 9ページ目 ================= -->
+  <div class="slide">
+    <div class="title title-gold" style="font-size: 8vw;">強度測定タイム！</div>
+    <div class="subtitle">各チームの橋にペットボトルを載せてみましょう</div>
+  </div>
+
+  <!-- ================= 10ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ブリッジ：検証データ</div>
+    <div class="title">構造による強度の変化</div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">平らなA4用紙1枚</div>
+        <div class="stat-num" style="color:#f87171;">10 g</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">蛇腹・筒状に折った紙</div>
+        <div class="stat-num" style="color:#4ade80;">500 g（50倍）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 11ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ブリッジの学び</div>
+    <div class="title">支え合う構造の力</div>
+    <div class="content-box">
+      <div class="list-item">💡 1枚では弱くても、力を分散させれば耐えられる</div>
+      <div class="list-item">💡 見えない部分の支えが全体の強度を決める</div>
+      <div class="list-item">💡 重荷を共に担い合うチームの姿</div>
+    </div>
+  </div>
+
+  <!-- ================= 12ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">第2の試練</div>
+    <div class="title title-highlight">ドロー</div>
+    <div class="subtitle">〜 沈黙のビジョン伝達 〜</div>
+    <div class="subtitle" style="font-size: 3vw; margin-top: 1vw;">制限時間：5分間</div>
+  </div>
+
+  <!-- ================= 13ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ドロー：ルール</div>
+    <div class="content-box">
+      <div class="list-item" style="color: #eab308; margin-bottom: 1.5vw;">【進行】ルール説明 ➡ お絵描き ➡ 答え合わせ・発表</div>
+      <div class="list-item">🎨 会話・文字は禁止！絵だけでしりとり</div>
+      <div class="list-item">順番に1人1個ずつ絵を描いて繋げる</div>
+      <div class="list-item">⏱ 5分間で何個描いて繋げられるか個数勝負！<br>（「用意、スタート！」の合図で開始）</div>
+    </div>
+  </div>
+
+  <!-- ================= 14ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ドロー：制作タイム</div>
+    <div class="title" style="font-size:5vw; margin-bottom:1vw;">カウントダウンスタート！</div>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8nz-gZHmSD0?si=mcZf58iCWXq7VH4a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>  </div>
+
+  <!-- ================= 15ページ目 ================= -->
+  <div class="slide">
+    <div class="title" style="font-size: 12vw; color: #f87171; font-weight: 900;">終了！</div>
+    <div class="subtitle" style="font-size: 5.5vw; color: #ffffff;">手を止めてください</div>
+  </div>
+
+  <!-- ================= 16ページ目 ================= -->
+  <div class="slide">
+    <div class="title title-gold" style="font-size: 8vw;">答え合わせタイム！</div>
+    <div class="subtitle">最初のお題から、どう伝わったか確認しましょう</div>
+  </div>
+
+  <!-- ================= 17ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ドロー：検証データ</div>
+    <div class="title" style="font-size: 5.5vw;">伝達における情報欠落</div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">1回の伝達で失われる情報</div>
+        <div class="stat-num" style="color:#f87171;">30〜40%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">3人経由した後の正確性</div>
+        <div class="stat-num" style="color:#f87171;">10% 以下</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 18ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">ドローの学び</div>
+    <div class="title">「伝えた」と「伝わった」の差</div>
+    <div class="content-box">
+      <div class="list-item">💡 同じ言葉でも人によって思い浮かべる像は違う</div>
+      <div class="list-item">💡 相手の視点に立った表現の工夫が必要</div>
+      <div class="list-item">💡 伝わらないことを責めず、ズレを楽しむ</div>
+    </div>
+  </div>
+
+  <!-- ================= 19ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">第3の試練</div>
+    <div class="title title-highlight">タワー</div>
+    <div class="subtitle">〜 天空を突くタワー 〜</div>
+    <div class="subtitle" style="font-size: 3vw; margin-top: 1vw;">制限時間：15分間</div>
+  </div>
+
+  <!-- ================= 20ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">タワー：ルール</div>
+    <div class="content-box">
+      <div class="list-item" style="color: #eab308; margin-bottom: 1.5vw;">【進行】ルール説明 ➡ タワーづくり ➡ 高さ計測</div>
+      <div class="list-item">📦 乾麺パスタ20本・テープ・ひも・マシュマロ</div>
+      <div class="list-item">頂上にマシュマロを乗せ、最も高いタワーを作れ</div>
+      <div class="list-item">計測時に自立していなければ失格</div>
+      <div class="list-item">⏱ 制作時間：15分（「用意、スタート！」で開始）</div>
+    </div>
+  </div>
+
+  <!-- ================= 21ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">タワー：制作タイム</div>
+    <div class="title" style="font-size:5vw; margin-bottom:1vw;">カウントダウンスタート！</div>
+    <div class="timer-wrapper">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/BuKAtgIpPEA?si=SlchCdCVZ-E7GJIG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- ================= 22ページ目 ================= -->
+  <div class="slide">
+    <div class="title" style="font-size: 12vw; color: #f87171; font-weight: 900;">終了！</div>
+    <div class="subtitle" style="font-size: 5.5vw; color: #ffffff;">手を止めてください</div>
+  </div>
+
+  <!-- ================= 23ページ目 ================= -->
+  <div class="slide">
+    <div class="title title-gold" style="font-size: 8vw;">高さ計測タイム！</div>
+    <div class="subtitle">マシュマロが一番高いチームはどこだ！？</div>
+  </div>
+
+  <!-- ================= 24ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">タワー：検証データ</div>
+    <div class="title" style="font-size: 5.5vw;">平均の高さ比較</div>
+    <div class="stat-grid" style="margin-bottom: 2vw;">
+      <div class="stat-card">
+        <div class="stat-label">ビジネススクール生（MBA）</div>
+        <div class="stat-num" style="color:#f87171;">25 cm</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">幼稚園児グループ</div>
+        <div class="stat-num" style="color:#4ade80;">66 cm</div>
+      </div>
+    </div>
+    <div class="content-box" style="text-align: center; padding: 1.5vw;">
+      <div class="list-item" style="margin: 0; color: #facc15;">🌎 ちなみに世界記録は… ９９ cm！</div>
+    </div>
+  </div>
+
+  <!-- ================= 25ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">タワーの学び</div>
+    <div class="title">なぜ幼稚園児が勝つのか？</div>
+    <div class="content-box">
+      <div class="list-item">❌ 大人は「1つの計画」にこだわり最後に倒す</div>
+      <div class="list-item">⭕ 園児は最初から試し、何度も試行錯誤する</div>
+      <div class="list-item">💡 手を動かして協力する姿勢が成功を生む</div>
+    </div>
+  </div>
+
+  <!-- ================= 26ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">表彰式</div>
+    <div class="title title-gold" style="font-size: 8vw;">結果発表</div>
+    <div class="subtitle">各チームの健闘を讃え合いましょう！</div>
+  </div>
+
+  <!-- ================= 27ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">総括</div>
+    <div class="title">ひとつのからだとして</div>
+    <div class="content-box">
+      <div class="list-item">1️⃣ 互いの重荷を背負い支え合う（ブリッジ）</div>
+      <div class="list-item">2️⃣ 違いを認め合い思いやりを持つ（ドロー）</div>
+      <div class="list-item">3️⃣ 試行錯誤を恐れず役割を分担する（タワー）</div>
+    </div>
+  </div>
+
+  <!-- ================= 28ページ目 ================= -->
+  <div class="slide">
+    <div class="badge">おわりに</div>
+    <div class="title title-gold" style="font-size: 8vw;">感謝の祈り</div>
+  </div>
+
+  <!-- ナビゲーションUI -->
+  <button class="nav-btn prev-btn" onclick="prevSlide()">◀ 前へ</button>
+  <div class="counter" id="counter">1 / 28 ページ</div>
+  <button class="nav-btn next-btn" onclick="nextSlide()">次へ ▶</button>
+
+</div>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('counter');
+
+  function showSlide(index) {
+    slides.forEach((s, i) => {
+      s.classList.toggle('active', i === index);
+    });
+    counter.textContent = (index + 1) + ' / ' + slides.length + ' ページ';
+  }
+
+  function nextSlide() {
+    if (currentSlide < slides.length - 1) {
+      currentSlide++;
+      showSlide(currentSlide);
+    }
+  }
+
+  function prevSlide() {
+    if (currentSlide > 0) {
+      currentSlide--;
+      showSlide(currentSlide);
+    }
+  }
+
+  // キーボード操作（矢印キー、スペース）
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+  });
+</script>
+
+</body>
+</html>
