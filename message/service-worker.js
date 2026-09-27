@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hhc-cache-20250531';
+const CACHE_NAME = 'hhc-cache-20260927';
 const urlsToCache = [
   './',
   './index.html',
