@@ -21,9 +21,19 @@
 	<script>
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', function () {
-				navigator.serviceWorker.register('./service-worker.js')
+				const hasActiveController = Boolean(navigator.serviceWorker.controller);
+				if (hasActiveController) {
+					navigator.serviceWorker.addEventListener('controllerchange', function () {
+						window.location.reload();
+					}, { once: true });
+				}
+
+				navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
 					.then(function (registration) {
 						console.log('ServiceWorker登録成功:', registration.scope);
+						registration.update().catch(function (err) {
+							console.error('ServiceWorker更新確認失敗:', err);
+						});
 					}, function (err) {
 						console.log('ServiceWorker登録失敗:', err);
 					});
