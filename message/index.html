@@ -41,19 +41,34 @@
 	</script>
 
 	<style>
+		:root {
+			--space-1: 0.25rem;
+			--space-2: 0.5rem;
+			--space-3: 1rem;
+			--space-4: 1.5rem;
+			--space-5: 2rem;
+		}
+
 		body {
 			font-family: 'Noto Sans JP', sans-serif;
 			font-size: 1rem;
 			line-height: 1.6;
 			color: #212529;
+			background-color: #f8f9fa;
 			margin: 0;
 			padding: 0;
+		}
+
+		.container {
+			max-width: 1200px;
+			background-color: #fff;
 		}
 
 		.btn-hhc {
 			width: 100%;
 			font-weight: 500;
-			padding: 0.75rem;
+			min-height: 44px;
+			padding: var(--space-2);
 			font-size: 1rem;
 			border: 1px solid #6c757d;
 			background-color: #fff;
@@ -147,6 +162,114 @@
 		#messageSelect {
 			font-size: 1.25rem;
 			padding: 0.75rem 1rem;
+		}
+
+		.nav-tabs .nav-link {
+			width: 100%;
+			padding: var(--space-3) var(--space-1);
+			font-size: clamp(1.25rem, 5vw, 1.75rem);
+			font-weight: 600;
+			white-space: nowrap;
+			text-align: center;
+		}
+
+		#tabMenu .nav-item {
+			flex: 1 1 0;
+		}
+
+		.verse-button {
+			min-height: 44px;
+			padding: var(--space-2) var(--space-3);
+			font-size: 1rem;
+		}
+
+		.font-size-controls .btn {
+			min-width: 56px;
+			min-height: 48px;
+			font-size: 1.5rem;
+			line-height: 1;
+		}
+
+		.latest-verse-buttons .verse-button {
+			flex: 1 1 0;
+			min-height: 60px;
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+
+		#message-tab-pane > section {
+			padding-top: var(--space-3);
+			border-top: 1px solid #dee2e6;
+		}
+
+		#message-tab-pane > section h3 {
+			margin-bottom: 0.75rem !important;
+			font-size: 1.25rem;
+			font-weight: 600;
+		}
+
+		@media (max-width: 575.98px) {
+			.container {
+				padding-right: var(--space-3);
+				padding-left: var(--space-3);
+			}
+
+			.container > .d-flex.justify-content-between.align-items-center.mb-3 {
+				display: grid !important;
+				grid-template-columns: 150px minmax(0, 1fr);
+				gap: var(--space-2) !important;
+			}
+
+			.container > .d-flex.justify-content-between.align-items-center.mb-3 .logo-img {
+				grid-row: 1 / span 2;
+				width: 150px;
+				margin: 0;
+			}
+
+			.container > .d-flex.justify-content-between.align-items-center.mb-3 > a,
+			.container > .d-flex.justify-content-between.align-items-center.mb-3 > button {
+				width: 100%;
+				max-width: 220px;
+				justify-self: center;
+				justify-content: center;
+				gap: var(--space-1) !important;
+				padding: var(--space-2) !important;
+				font-size: 0.85rem;
+				white-space: nowrap;
+			}
+
+			.btn-hhc {
+				padding: 0.65rem 0.25rem;
+				font-size: 0.95rem;
+			}
+
+			.verse-button {
+				min-height: 48px;
+				padding: var(--space-2) var(--space-3);
+				font-size: 1.05rem;
+			}
+
+			.latest-verse-buttons {
+				gap: var(--space-2) !important;
+			}
+
+			.latest-verse-buttons .verse-button {
+				min-height: 64px;
+				padding: var(--space-2);
+				font-size: 1.1rem;
+			}
+
+			.font-size-controls {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+			}
+
+			.font-size-controls .btn {
+				flex: 1 1 0;
+				min-height: 56px;
+				font-size: 1.75rem;
+			}
 		}
 
 		.playback-btn {
@@ -273,11 +396,6 @@
 				<button class="nav-link" id="test-tab" data-bs-toggle="tab" data-bs-target="#test-tab-pane"
 					type="button" role="tab" aria-controls="test-tab-pane" aria-selected="false">暗唱聖句</button>
 			</li>
-			<li class="nav-item" role="presentation">
-				<button class="nav-link" id="test2-tab" data-bs-toggle="tab" data-bs-target="#test2-tab-pane"
-					type="button" role="tab" aria-controls="test2-tab-pane" aria-selected="false">実験 coming
-					soon!</button>
-			</li>
 		</ul>
 
 		<div class="tab-content" id="tabContent">
@@ -295,13 +413,13 @@
 						▶
 					</button>
 				</div>
-				<div class="row g-1 mb-1">
+				<div class="row g-2 mb-2">
 					<div class="col-3"><button class="btn btn-hhc" onclick="skip(-30)">30秒</button></div>
 					<div class="col-3"><button class="btn btn-hhc" onclick="skip(-5)">5秒</button></div>
 					<div class="col-3"><button class="btn btn-hhc" onclick="skip(5)">5秒&gt;&gt;</button></div>
 					<div class="col-3"><button class="btn btn-hhc" onclick="skip(30)">30秒&gt;&gt;</button></div>
 				</div>
-				<div class="row g-1 mb-1">
+				<div class="row g-2 mb-2">
 					<div class="col-2"><button class="btn btn-hhc" onclick="rateup(0.5)">x0.5</button></div>
 					<div class="col-2"><button class="btn btn-hhc" onclick="rateup(0.8)">x0.8</button></div>
 					<div class="col-2"><button class="btn btn-hhc" onclick="rateup(1.0)">x1.0</button></div>
@@ -309,7 +427,7 @@
 					<div class="col-2"><button class="btn btn-hhc" onclick="rateup(2.0)">x2.0</button></div>
 					<div class="col-2"><button class="btn btn-hhc" onclick="rateup(2.5)">x2.5</button></div>
 				</div>
-				<div class="row g-1 mb-1">
+				<div class="row g-2 mb-2">
 					<div class="col-2"><button class="btn btn-hhc" onclick="move(600)">10分</button></div>
 					<div class="col-2"><button class="btn btn-hhc" onclick="move(1200)">20分</button></div>
 					<div class="col-2"><button class="btn btn-hhc" onclick="move(1800)">30分</button></div>
@@ -318,26 +436,8 @@
 					<div class="col-2"><button class="btn btn-hhc" onclick="move(3600)">60分</button></div>
 				</div>
 
-				<div class="row mb-3 g-2">
-					<div class="col">
-						<button class="btn" onclick="toggleView('pptContainer')">
-							📽 スライドを見る
-						</button>
-					</div>
-					<div class="col">
-						<button class="btn" onclick="toggleView('weeklyReport')">
-							📰 週報を見る
-						</button>
-					</div>
-					<div class="col">
-						<button class="btn" onclick="toggleView('schedule')">
-							📅 予定表を見る
-						</button>
-					</div>
-				</div>
-
-
-				<div id="pptContainer" style="display: none;">
+				<section id="pptContainer" class="mb-4">
+					<h3 class="h4 mb-3">📽 礼拝スライド</h3>
 					<div style="max-width: 1000px; margin: auto; aspect-ratio: 4 / 3; position: relative;">
 						<!-- ローディング表示 -->
 						<div id="pptLoading" class="d-flex justify-content-center align-items-center"
@@ -350,23 +450,25 @@
 							style="position: absolute; width: 100%; height: 100%; border: none; z-index: 2;">
 						</iframe>
 					</div>
-				</div>
+				</section>
 
 				<!-- 週報 -->
-				<div id="weeklyReport" style="display: none;" class="mb-4">
+				<section id="weeklyReport" class="mb-4">
+					<h3 class="h4 mb-3">📰 週報</h3>
 					<div class="overflow-auto border rounded p-2" style="white-space: nowrap;">
 						<img src="https://onedrive.live.com/embed?resid=DF8117155F580907%211927&authkey=%21AGrAIvgcSALoIlE"
 							style="height: auto; width: 1000px;" alt="週報（横スクロール可）">
 					</div>
-				</div>
+				</section>
 
 				<!-- 予定表 -->
-				<div id="schedule" style="display: none;" class="mb-4">
+				<section id="schedule" class="mb-4">
+					<h3 class="h4 mb-3">📅 予定表</h3>
 					<div class="overflow-auto border rounded p-2" style="white-space: nowrap;">
 						<img src="https://onedrive.live.com/embed?resid=DF8117155F580907%211348&authkey=%21AFqBOdaSYRks83Y"
 							style="height: auto; width: 500px;" alt="予定表（横スクロール可）">
 					</div>
-				</div>
+				</section>
 
 
 
@@ -385,38 +487,19 @@
 			</div>
 
 			<div class="tab-pane fade" id="test-tab-pane" role="tabpanel" aria-labelledby="test-tab">
-				毎週の"黄金の聖句"と説教中にでてきた"暗唱してほしい聖書個所"を覚えるゲームにしてみました！難易度選べます！
+				毎週の"黄金の聖句"と説教中にでてきた"暗唱してほしい聖書個所"を覚えるゲームにしてみました！
 				他にも追加したい聖句があれば、ぜひ教えてください！
-				<details class="mb-3">
-					<summary class="fs-5 fw-semibold text-primary">🎮 暗唱聖句ゲームのやり方（タップで開く）</summary>
-					<div class="mt-2">
-						<ol>
-							<li>下の「No.◯◯」ボタンから、出題する聖句を選びます。</li>
-							<li>「難易度」を選ぶと、隠れる文字の量が変わります。</li>
-							<li>虫食い表示された聖句が表示されます。</li>
-							<li>◯◯（●）のところを押すと、正解の文字が出てきます。</li>
-							<li>覚えてから答え合わせをしてみましょう！</li>
-						</ol>
-						<p class="mb-0">💡 文字サイズは「＋」「－」ボタンで調整できます。</p>
-					</div>
-				</details>
-
 				<div class="controls mb-2">
-					<strong>難易度：</strong>
-	<label><input type="radio" name="level" value="auto" checked> 自動</label>
-	<label><input type="radio" name="level" value="0"> やさしい</label>
-	<label><input type="radio" name="level" value="0.4"> ふつう</label>
-	<label><input type="radio" name="level" value="0.8"> むずかしい</label>
-	<label><input type="radio" name="level" value="1.0"> 超むず</label>
-</div>
-				<div class="mb-2">
-					<strong>文字サイズ：</strong>
-					<button class="btn btn-outline-secondary btn-sm" id="fontMinus">－</button>
-					<button class="btn btn-outline-secondary btn-sm" id="fontPlus">＋</button>
+					<strong>難易度：自動</strong>
+					<p class="text-muted mb-0">日曜の礼拝後にやさしい状態に戻り、月曜から土曜にかけて1日ごとに難しくなります。</p>
 				</div>
-				<h3>暗唱聖句：<span id="verseTitle">選択してください</span></h3>
+				<div class="font-size-controls mb-3">
+					<strong>文字サイズ：</strong>
+					<button class="btn btn-outline-secondary" id="fontMinus" aria-label="文字サイズを小さく">－</button>
+					<button class="btn btn-outline-secondary" id="fontPlus" aria-label="文字サイズを大きく">＋</button>
+				</div>
 				<div id="verse" class="verse-area" style="margin-top: 1em;"></div>
-				<div id="verseButtons" class="mb-3 d-flex flex-wrap gap-2"></div>
+				<div id="verseButtons" class="mb-3"></div>
 
 			</div>
 
@@ -432,12 +515,23 @@
 		<script>
 			let list = [];
 			let swiperInstance;
-			let pptLoaded = false;
-			let pptRequested = false;
 			let currentVerse = null;
-			let currentFontSize = 40;
+			const mobileVerseLayout = window.matchMedia("(max-width: 575.98px)");
+			let currentFontSize = mobileVerseLayout.matches ? 28 : 40;
+			mobileVerseLayout.addEventListener("change", event => {
+				currentFontSize = event.matches ? 28 : 40;
+				applyFontSize();
+			});
 
 			document.addEventListener("DOMContentLoaded", () => {
+				applyFontSize();
+				const pptFrame = document.getElementById("pptFrame");
+				const pptLoader = document.getElementById("pptLoading");
+				pptFrame.addEventListener("load", () => {
+					pptLoader.style.display = "none";
+				});
+				pptFrame.src = "https://onedrive.live.com/embed?cid=DF8117155F580907&resid=DF8117155F580907%211340&authkey=AF6P8Ar7u7YupbA&em=2&wdAr=1.00&wdEaa=0";
+
 				fetch("./list.json")
 					.then(res => {
 						if (!res.ok) throw new Error(`説教リストの読み込みに失敗しました (${res.status})`);
@@ -528,29 +622,62 @@
 						verseList = parsed.data.filter(row => row['本文']?.trim());
 
 						const container = document.getElementById("verseButtons");
-						verseList.forEach(row => {
+						const verseButtons = [];
+						const latestContainer = document.createElement("div");
+						latestContainer.className = "latest-verse-buttons d-flex gap-2 mb-3";
+						container.appendChild(latestContainer);
+
+						function createVerseButton(row, parent) {
 							const no = row['番号']?.trim();
 							const btn = document.createElement("button");
-							btn.className = "btn btn-outline-primary btn-sm";
+							btn.className = "btn btn-outline-primary verse-button";
 							btn.textContent = `${no}`;
 							btn.onclick = () => {
+								verseButtons.forEach(({ button }) => button.classList.remove("active"));
+								btn.classList.add("active");
 								currentVerse = row;
 								updateVerse(getCurrentLevel());
-								document.getElementById("verseTitle").textContent = `${row['聖書個所'] || '（不明）'}`;
 								sendLog("verse_select", {
 									number: row['番号'],
 									verse: row['聖書個所']
 								});
 							};
-							container.appendChild(btn);
+							parent.appendChild(btn);
+							verseButtons.push({ row, button: btn });
+							return btn;
+						}
+
+						const latestVerses = verseList.slice(0, 2);
+						latestVerses.forEach(row => createVerseButton(row, latestContainer));
+
+						const pastVerses = verseList.slice(2);
+						const hasDate = row => /\d{1,2}\s*\/+\s*\d{1,2}/.test(row['番号'] || '');
+						const datedVerses = pastVerses.filter(hasDate);
+						const undatedVerses = pastVerses.filter(row => !hasDate(row));
+
+						[
+							{ title: "過去の黄金の聖句", rows: datedVerses },
+							{ title: "暗唱してほしい聖書個所", rows: undatedVerses }
+						].forEach(group => {
+							if (!group.rows.length) return;
+
+							const details = document.createElement("details");
+							details.className = "mb-2";
+							const summary = document.createElement("summary");
+							summary.className = "mb-2";
+							summary.textContent = `${group.title}（${group.rows.length}件）`;
+							const buttons = document.createElement("div");
+							buttons.className = "d-flex flex-wrap gap-2";
+							group.rows.forEach(row => createVerseButton(row, buttons));
+							details.append(summary, buttons);
+							container.appendChild(details);
 						});
 
-						// 初期表示：No.1
-						const first = verseList.find(row => row['番号']?.trim() === "1");
-						if (first) {
-							currentVerse = first;
+						if (verseButtons.length) {
+							const latest = verseButtons[0];
+							latest.button.classList.add("active");
+							currentVerse = latest.row;
 							updateVerse(getCurrentLevel());
-							document.getElementById("verseTitle").textContent = first['聖書個所'] || '（不明）';
 						}
 					})
 					.catch(error => console.error("暗唱聖句の読み込みエラー:", error));
@@ -697,36 +824,6 @@
 				});
 			}
 
-			function toggleView(targetId) {
-				document.getElementById('pptContainer').style.display = 'none';
-				document.getElementById('weeklyReport').style.display = 'none';
-				document.getElementById('schedule').style.display = 'none';
-
-				document.getElementById(targetId).style.display = 'block';
-
-				if (targetId === 'pptContainer') {
-					const loader = document.getElementById('pptLoading');
-					const iframe = document.getElementById('pptFrame');
-
-					if (!pptLoaded) {
-						loader.style.display = 'flex';
-						if (!pptRequested) {
-							iframe.onload = () => {
-								loader.style.display = 'none';
-								pptLoaded = true;
-							};
-							iframe.onerror = () => {
-								loader.style.display = 'none';
-								console.error("スライドの読み込みに失敗しました");
-							};
-							iframe.src = "https://onedrive.live.com/embed?cid=DF8117155F580907&resid=DF8117155F580907%211340&authkey=AF6P8Ar7u7YupbA&em=2&wdAr=1.00&wdEaa=0";
-							pptRequested = true;
-						}
-					} else {
-						loader.style.display = 'none'; // すぐ消す
-					}
-				}
-			}
 			let deferredPrompt = null;
 
 			window.addEventListener('beforeinstallprompt', (e) => {
@@ -807,18 +904,15 @@
 			function getAutoLevel() {
 				const now = new Date();
 				const day = now.getDay();
-				const hours = now.getHours();
-				const minutes = now.getMinutes();
-				const hoursSinceSundayNoon = day === 0
-					? (hours >= 12 ? hours - 12 : 156 + hours) + minutes / 60
-					: 12 + (day - 1) * 24 + hours + minutes / 60;
+				const dayInCycle = day === 0
+					? (now.getHours() >= 12 ? 0 : 6)
+					: day;
 
-				return Math.min(Math.max(hoursSinceSundayNoon / 168, 0), 1);
+				return dayInCycle / 6;
 			}
 
 			function getCurrentLevel() {
-				const selectedLevel = document.querySelector('input[name="level"]:checked')?.value;
-				return selectedLevel === "auto" ? getAutoLevel() : Number(selectedLevel || 0);
+				return getAutoLevel();
 			}
 
 			function applyFontSize() {
@@ -867,16 +961,6 @@
 					})
 				}).catch(error => console.error("ログ送信に失敗しました:", error));
 			}
-
-			// 難易度変更時
-			const radios = document.querySelectorAll('input[name="level"]');
-			radios.forEach((radio) => {
-				radio.addEventListener("change", () => {
-					const level = getCurrentLevel();
-					updateVerse(level);
-					sendLog("level_change", { level });
-				});
-			});
 
 			// マスク解除（答えを見る）時
 			document.addEventListener("click", function (e) {
