@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>教会エントランス インフォメーション</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 基本レイアウト (テレビの表示領域いっぱいに追従) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #e4ede1;
+      font-family: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      color: #19392c;
+      display: grid;
+      grid-template-columns: 64.5833vw 35.4167vw;
+      grid-template-rows: 92.5926vh 7.4074vh;
+    }
+
+    /* スライド手動送りボタン */
+    .slide-next-btn {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(25, 57, 44, 0.85);
+      color: #fff;
+      border: 2px solid #6f9874;
+      border-radius: 30px;
+      padding: 10px 22px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 30;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: background 0.2s, transform 0.1s;
+    }
+    .slide-next-btn:hover {
+      background: rgba(35, 80, 62, 0.95);
+      transform: scale(1.05);
+    }
+    .brand-logo {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      width: 116px;
+      height: 116px;
+      object-fit: contain;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 4px solid #6f9874;
+      border-radius: 18px;
+      z-index: 20;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+    .slide-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+      background-size: cover;
+      background-position: center;
+    }
+    .slide.active {
+      opacity: 1;
+    }
+    .slide.homepage-scroll {
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      background-color: #18362a;
+      background-position: center top;
+    }
+    .slide.active.homepage-scroll {
+      animation: homepage-scroll 24s ease-in-out infinite alternate;
+    }
+    .slide.instagram-scroll {
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      background-color: #18362a;
+      background-position: center top;
+    }
+    .slide.active.instagram-scroll {
+      animation: instagram-scroll 32s ease-in-out infinite alternate;
+    }
+    .slide.photo-pan {
+      background-size: 115% auto;
+      background-repeat: no-repeat;
+    }
+    .slide.active.photo-pan {
+      animation: photo-pan 7s ease-in-out infinite alternate;
+    }
+    @keyframes homepage-scroll {
+      0% { background-position: center top; }
+      100% { background-position: center bottom; }
+    }
+    @keyframes instagram-scroll {
+      0% { background-position: center top; }
+      100% { background-position: center bottom; }
+    }
+    @keyframes photo-pan {
+      0% {
+        background-position: 42% 45%;
+        background-size: 115% auto;
+      }
+      100% {
+        background-position: 58% 55%;
+        background-size: 128% auto;
+      }
+    }
+
+    /* スライド内のテキストオーバーレイ（擦りガラス風カード） */
+    .slide-card {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      right: 40px;
+      background: rgba(19, 57, 43, 0.9);
+      border: 3px solid rgba(164, 194, 157, 0.9);
+      border-radius: 28px;
+      padding: 36px 48px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      color: #fff;
+    }
+    .slide-tag {
+      display: inline-block;
+      background: #d88773;
+      color: #fff;
+      font-size: 26px;
+      font-weight: bold;
+      padding: 6px 18px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      letter-spacing: 0.05em;
+    }
+    .slide-title {
+      font-size: 46px;
+      line-height: 1.45;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+    .slide-sub {
+      font-size: 28px;
+      color: #f0f5ed;
+      margin-top: 14px;
+      text-align: right;
+      font-weight: 500;
+    }
+    .slide-sub.link {
+      font-size: 22px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+    .slide-title.lyrics {
+      font-size: 38px;
+      line-height: 1.4;
+      font-weight: 700;
+      color: #ffd166;
+      margin-bottom: 8px;
+      white-space: pre-line;
+    }
+    .lyrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+      margin-top: 10px;
+    }
+    .lyrics-column-label {
+      font-size: 28px;
+      font-weight: 700;
+      color: #d88773;
+      margin-bottom: 8px;
+    }
+    .lyrics-column-text {
+      font-size: 34px;
+      line-height: 1.6;
+      font-weight: 700;
+      white-space: pre-line;
+      color: #ffffff;
+    }
+    .slide-meaning {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.35);
+      font-size: 25px;
+      line-height: 1.55;
+      color: #e0edd9;
+      font-weight: 500;
+    }
+
+    /* 右側：サイドバー */
+    .sidebar {
+      background: #d4e2cf;
+      border-left: 4px solid #6f9874;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* 日時・時計 */
+    .clock-panel {
+      background: #f0f5ed;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      border: 2px solid #a4bea0;
+    }
+    .clock-time {
+      font-size: 82px;
+      font-weight: 700;
+      font-family: monospace, sans-serif;
+      letter-spacing: 0.02em;
+      color: #19392c;
+    }
+    .clock-date {
+      font-size: 24px;
+      color: #557b62;
+      margin-top: 6px;
+      white-space: nowrap;
+    }
+
+    /* プログラムリスト */
+    .section-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #19392c;
+      border-bottom: 2px solid #6f9874;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .schedule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      background: #f0f5ed;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 2px solid #a4bea0;
+    }
+    .schedule-time {
+      font-size: 28px;
+      font-weight: bold;
+      color: #4b9bcb;
+      width: 110px;
+      font-family: monospace, sans-serif;
+    }
+    .schedule-name {
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 500;
+    }
+
+    /* 複数QRコード領域 */
+    .qr-panel {
+      margin-top: auto;
+      background: #f0f5ed;
+      border-radius: 16px;
+      padding: 16px 20px;
+      border: 2px solid #a4bea0;
+    }
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .qr-item {
+      background: #fff;
+      padding: 8px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid #c8d8c2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .qr-item img {
+      width: 76px;
+      height: 76px;
+      display: block;
+      margin: 0 auto 4px auto;
+    }
+    .qr-label {
+      font-size: 11px;
+      font-weight: bold;
+      color: #19392c;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .qr-desc-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #19392c;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    /* スライド内のリンク・QRレイアウト */
+    .slide-link-layout {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+    .slide-link-text {
+      flex: 1;
+    }
+    .slide-link-badges {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 16px 24px;
+      border-radius: 16px;
+      border: 3px solid #6f9874;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .slide-badge-icon {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #fff;
+      padding: 4px;
+      border: 2px solid #a4bea0;
+    }
+    .slide-badge-qr {
+      width: 104px;
+      height: 104px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* 最下部：テロップティッカー（太字化） */
+    .ticker-bar {
+      grid-column: 1 / -1;
+      background: #d4e2cf;
+      border-top: 2px solid #a4bea0;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-label {
+      background: #6f9874;
+      color: #fff;
+      font-weight: 900;
+      font-size: 26px;
+      padding: 0 28px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    .ticker-content {
+      white-space: nowrap;
+      padding-left: 100%;
+      display: inline-block;
+      animation: ticker 35s linear infinite;
+      font-size: 30px;
+      font-weight: 700;
+      color: #19392c;
+    }
+
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 左メイン：スライドショー -->
+  <div class="main-area">
+    <img class="brand-logo" src="logo_sq_big.png" alt="ひたち光教会">
+    <button class="slide-next-btn" onclick="nextSlide()">次へ ❯</button>
+    <div class="slide-container" id="slideContainer">
+      <!-- JavaScriptで動的生成 -->
+    </div>
+  </div>
+
+  <!-- 右サイドバー：固定情報 -->
+  <div class="sidebar">
+    <div class="clock-panel">
+      <div class="clock-time" id="clockTime">--:--</div>
+      <div class="clock-date" id="clockDate">----年--月--日(-)</div>
+    </div>
+
+    <div>
+      <div class="section-title" id="reportTitle">本日の集会案内</div>
+      <div class="schedule-list" id="scheduleList">
+        <!-- JavaScriptで動的生成 -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 最下部：テロップ -->
+  <div class="ticker-bar">
+    <div class="ticker-label">お知らせ</div>
+    <div class="ticker-content" id="tickerContent">
+      <!-- JavaScriptで動的生成 -->
+    </div>
+  </div>
+
+  <script>
+
+    const serviceDateLabel = "10月25日";
+    const serviceDateShort = "10/25";
+    const serviceDateFull = "2026年10月25日";
+
+    // --- 運用データ（毎週ここを差し替える、または別ファイルから読み込む） ---
+    const afternoonSchedule = [
+      { time: "礼拝後", name: "愛餐会" },
+      { time: "13:30", name: "聖書通読と賛美の学び会" },
+      { time: "13:30", name: "委細面談" },
+      { time: "14:30", name: "環境美化" }
+    ];
+
+    const signageData = {
+      report: {
+        title: `${serviceDateFull} 予定`
+      },
+      goldenVerse: {
+        reference: "箴言4:20〜27",
+        text: "あなたの心を見守れ。"
+      },
+      hymnStudy: {
+        hymn: "聖歌25・138・567・628・376番",
+        title: `${serviceDateLabel} 主日礼拝賛美`,
+        meaning: "主日礼拝の賛美"
+      },
+      links: [
+        { name: "公式ホームページ", url: "https://hitachihikari.net/", bg: "images/photo1.jpg" },
+        { name: "公式Instagram", url: "https://www.instagram.com/hitachihikari/", bg: "images/photo2.jpg" },
+        { name: "ひたち光教会おはな Instagram", url: "https://www.instagram.com/hitachihikari_ohana/", bg: "images/photo3.jpg" },
+        { name: "ひたち光教会のおいしい Instagram", url: "https://www.instagram.com/hitachihikari_oishii/", bg: "images/photo4.jpg" },
+        { name: "公式YouTube", url: "https://www.youtube.com/channel/UCwqc95wswE8wj1voDkejndA", bg: "images/photo5.jpg" }
+      ],
+      schedules: [
+        { time: "10:00", name: "礼拝前の賛美・祈り" },
+        { time: "10:30", name: "主日礼拝" },
+        ...afternoonSchedule
+      ],
+      slides: [
+        {
+          tag: `${serviceDateLabel} 主日礼拝`,
+          title: "詩篇112篇1〜6節",
+          sub: "招詞／聖歌25・138・567・628・376",
+          kind: "photo-pan",
+          bg: "images/photo1.jpg"
+        },
+        {
+          tag: `${serviceDateLabel} 主日礼拝`,
+          title: "箴言4章20〜27節",
+          sub: "説教「あなたの心を見守れ。」",
+          kind: "photo-pan",
+          bg: "images/photo2.jpg"
+        },
+        {
+          tag: `${serviceDateLabel}の行事`,
+          title: "愛餐会・聖書通読と賛美の学び会",
+          sub: "愛餐会：礼拝後／学び会：13:30〜14:30（創世記24章、マタイ24章）",
+          kind: "photo-pan",
+          bg: "images/photo3.jpg"
+        },
+        {
+          tag: `${serviceDateLabel}の行事`,
+          title: "委細面談・環境美化",
+          sub: "委細面談：13:30〜15:00／環境美化：14:30〜16:00",
+          kind: "photo-pan",
+          bg: "images/photo5.jpg"
+        },
+        {
+          tag: `${serviceDateLabel}の聖書箇所`,
+          title: "あなたの心を見守れ。",
+          sub: "箴言4章20〜27節",
+          bg: "images/photo4.jpg"
+        },
+        {
+          tag: `${serviceDateLabel}の説教`,
+          title: "あなたの心を見守れ。",
+          sub: "説教：尹 秉甲師",
+          bg: "images/photo7.jpg"
+        },
+        {
+          tag: "お知らせ",
+          title: "愛餐会",
+          sub: "礼拝後に行います（祈祷：本間正子姉）",
+          kind: "photo-pan",
+          bg: "images/photo8.jpg"
+        },
+        {
+          tag: "公式リンク",
+          title: "公式ホームページ",
+          sub: "https://hitachihikari.net/",
+          url: "https://hitachihikari.net/",
+          icon: "logo_sq_big.png",
+          kind: "homepage-scroll",
+          bg: "images/homepage-hitachihikari.png"
+        },
+        {
+          tag: "公式リンク",
+          title: "ひたち光教会 Instagram",
+          sub: "https://www.instagram.com/hitachihikari/",
+          url: "https://www.instagram.com/hitachihikari/",
+          icon: "images/instagram-hitachihikari.png",
+          kind: "instagram-scroll",
+          bg: "images/instagram-hitachihikari.png"
+        },
+        {
+          tag: "公式リンク",
+          title: "ひたち光教会おはな Instagram",
+          sub: "https://www.instagram.com/hitachihikari_ohana/",
+          url: "https://www.instagram.com/hitachihikari_ohana/",
+          icon: "images/instagram-ohana.png",
+          kind: "instagram-scroll",
+          bg: "images/instagram-ohana.png"
+        },
+        {
+          tag: "公式リンク",
+          title: "ひたち光教会のおいしい Instagram",
+          sub: "https://www.instagram.com/hitachihikari_oishii/",
+          url: "https://www.instagram.com/hitachihikari_oishii/",
+          icon: "images/instagram-oishii.png",
+          kind: "instagram-scroll",
+          bg: "images/instagram-oishii.png"
+        },
+        {
+          tag: "公式リンク",
+          title: "ひたち光教会の写真アルバム",
+          sub: "https://photos.app.goo.gl/ESPV7T1gdWkd4iaX8",
+          url: "https://photos.app.goo.gl/ESPV7T1gdWkd4iaX8",
+          icon: "images/photos.png",
+          kind: "instagram-scroll",
+          bg: "images/photos.png"
+        },
+        {
+          tag: "公式リンク",
+          title: "公式YouTube",
+          sub: "https://www.youtube.com/channel/UCwqc95wswE8wj1voDkejndA",
+          url: "https://www.youtube.com/channel/UCwqc95wswE8wj1voDkejndA",
+          icon: "images/youtube-channel.png",
+          kind: "instagram-scroll",
+          bg: "images/youtube-channel.png"
+        }
+      ],
+      tickers: [
+        `${serviceDateLabel}の主日礼拝：招詞 詩篇112篇1〜6節／聖書 箴言4章20〜27節。`,
+        "水曜祈祷会は19:00〜20:30です。学びは伝道についてです。",
+        "礼拝後は愛餐会、13:30から聖書通読と賛美の学び会・委細面談、14:30から環境美化を行います。",
+        `今週の週報：${serviceDateFull}`
+      ]
+    };
+
+    // --- 時計更新 ---
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clockTime').textContent = `${hours}:${minutes}`;
+
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      const day = days[now.getDay()];
+      document.getElementById('clockDate').textContent = `${year}年${month}月${date}日 (${day})`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- プログラムとテロップの初期描画 ---
+    function initContents() {
+      document.getElementById('reportTitle').textContent = signageData.report.title;
+
+      // スケジュール
+      const scheduleList = document.getElementById('scheduleList');
+      scheduleList.innerHTML = signageData.schedules.map(item => `
+        <div class="schedule-item">
+          <div class="schedule-time">${item.time}</div>
+          <div class="schedule-name">${item.name}</div>
+        </div>
+      `).join('');
+
+      // スライド生成
+      const container = document.getElementById('slideContainer');
+      container.innerHTML = signageData.slides.map((s, idx) => `
+        <div class="slide ${idx === 0 ? 'active' : ''} ${s.kind || ''}" style="background-image: url('${s.bg}');">
+          <div class="slide-card">
+            <div class="slide-tag">${s.tag}</div>
+            ${s.url ? `
+              <div class="slide-link-layout">
+                <div class="slide-link-text">
+                  <div class="slide-title ${s.kind || ''}">${s.title}</div>
+                  <div class="slide-sub link">${s.sub}</div>
+                </div>
+                <div class="slide-link-badges">
+                  ${s.icon ? `<img src="${s.icon}" class="slide-badge-icon" alt="アイコン">` : ''}
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(s.url)}" class="slide-badge-qr" alt="QRコード">
+                </div>
+              </div>
+            ` : `
+              <div class="slide-title ${s.kind || ''}">${s.title}</div>
+              ${s.lyrics ? `<div class="lyrics-grid"><div><div class="lyrics-column-label">本文</div><div class="lyrics-column-text">${s.lyrics}</div></div><div><div class="lyrics-column-label">意味</div><div class="lyrics-column-text">${s.meaning}</div></div></div>` : ''}
+              <div class="slide-sub">${s.sub}</div>
+            `}
+          </div>
+        </div>
+      `).join('');
+
+      // テロップ
+      const tickerContainer = document.getElementById('tickerContent');
+      tickerContainer.innerHTML = signageData.tickers.map(t => `<span class="ticker-item">● ${t}</span>`).join('');
+    }
+    initContents();
+
+    // --- スライド自動切り替え・手動切り替え制御 ---
+    let currentSlide = 0;
+    let slideInterval = setInterval(autoAdvanceSlide, 16000);
+
+    function showSlide(index) {
+      const slides = document.querySelectorAll('.slide');
+      if (slides.length === 0) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (index + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }
+
+    function autoAdvanceSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    function nextSlide() {
+      // 手動で次へ送ったときはタイマーをリセットして再カウント
+      showSlide(currentSlide + 1);
+      clearInterval(slideInterval);
+      slideInterval = setInterval(autoAdvanceSlide, 16000);
+    }
+
+    // --- メモリリーク防止（6時間ごとにページリロード） ---
+    setTimeout(() => {
+      location.reload();
+    }, 6 * 60 * 60 * 1000);
+  </script>
+</body>
+</html>
