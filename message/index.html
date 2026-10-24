@@ -637,6 +637,10 @@
 								btn.classList.add("active");
 								currentVerse = row;
 								updateVerse(getCurrentLevel());
+								document.getElementById("verse").scrollIntoView({
+									behavior: "smooth",
+									block: "start"
+								});
 								sendLog("verse_select", {
 									number: row['番号'],
 									verse: row['聖書個所']
