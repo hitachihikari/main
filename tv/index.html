@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>教会エントランス インフォメーション</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,16 +25,22 @@
       padding: 0;
       user-select: none;
     }
+    html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
     body {
-      width: 100vw;
+      width: 100%;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       background: var(--forest-deep);
       font-family: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
       color: var(--ink);
       display: grid;
       grid-template-columns: 63% 37%;
-      grid-template-rows: 92.5vh 7.5vh;
+      grid-template-rows: minmax(0, 92.5fr) minmax(0, 7.5fr);
     }
     .main-area {
       position: relative;
@@ -64,6 +70,43 @@
     .slide-next-btn:hover {
       background: #388e3c;
       transform: scale(1.05);
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 28px;
+      right: 28px;
+      background: rgba(72, 168, 63, 0.96);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-size: clamp(16px, 1.1vw, 22px);
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 30;
+      box-shadow: 0 8px 24px rgba(30, 75, 37, 0.3);
+    }
+    .slide-next-btn:focus,
+    .fullscreen-btn:focus {
+      outline: 4px solid #f3c85b;
+      outline-offset: 3px;
+    }
+    .display-status {
+      position: fixed;
+      left: 50%;
+      bottom: 9vh;
+      z-index: 50;
+      max-width: 90vw;
+      transform: translateX(-50%);
+      padding: 12px 20px;
+      border-radius: 10px;
+      background: rgba(32, 41, 35, 0.94);
+      color: #fff;
+      font-size: clamp(15px, 1.1vw, 20px);
+      text-align: center;
+    }
+    .display-status[hidden] {
+      display: none;
     }
     .brand-logo {
       position: absolute;
@@ -496,10 +539,12 @@
   <div class="main-area">
     <img class="brand-logo" src="logo_sq_big.png" alt="ひたち光教会">
     <button class="slide-next-btn" onclick="nextSlide()">次へ ❯</button>
+    <button class="fullscreen-btn" id="fullscreenButton" onclick="toggleFullscreen()">全画面表示</button>
     <div class="slide-container" id="slideContainer">
       <!-- JavaScriptで動的生成 -->
     </div>
   </div>
+  <div class="display-status" id="displayStatus" role="status" aria-live="polite" hidden></div>
 
   <!-- 右サイドバー：固定情報 -->
   <div class="sidebar">
@@ -531,17 +576,53 @@
 
   <script>
 
-    const serviceDateLabel = "10月25日";
-    const serviceDateShort = "10/25";
-    const serviceDateFull = "2026年10月25日";
+    // BEGIN GENERATED WEEKLY DATA
+    const weeklyData = {
+      "date": "2026-10-25",
+      "invitationPassage": "詩篇112篇1〜6節",
+      "biblePassage": "箴言4章20〜27節",
+      "hymns": [
+            "25",
+            "138",
+            "567",
+            "628",
+            "376"
+      ],
+      "sermonTitle": "あなたの心を見守れ。",
+      "preacher": "尹 秉甲師",
+      "mealPrayer": "本間正子姉",
+      "schedules": [
+            {
+                  "time": "10:00",
+                  "name": "礼拝前の賛美・祈り"
+            },
+            {
+                  "time": "10:30",
+                  "name": "主日礼拝"
+            },
+            {
+                  "time": "礼拝後",
+                  "name": "愛餐会"
+            },
+            {
+                  "time": "13:30",
+                  "name": "聖書通読と賛美の学び会"
+            },
+            {
+                  "time": "13:30",
+                  "name": "委細面談"
+            },
+            {
+                  "time": "14:30",
+                  "name": "環境美化"
+            }
+      ]
+};
+    // END GENERATED WEEKLY DATA
 
-    // --- 運用データ（毎週ここを差し替える、または別ファイルから読み込む） ---
-    const afternoonSchedule = [
-      { time: "礼拝後", name: "愛餐会" },
-      { time: "13:30", name: "聖書通読と賛美の学び会" },
-      { time: "13:30", name: "委細面談" },
-      { time: "14:30", name: "環境美化" }
-    ];
+    const serviceDate = new Date(`${weeklyData.date}T00:00:00`);
+    const serviceDateLabel = `${serviceDate.getMonth() + 1}月${serviceDate.getDate()}日`;
+    const serviceDateFull = `${serviceDate.getFullYear()}年${serviceDate.getMonth() + 1}月${serviceDate.getDate()}日`;
 
     function shuffleItems(items) {
       const shuffled = [...items];
@@ -685,11 +766,11 @@
         title: `${serviceDateFull} 予定`
       },
       goldenVerse: {
-        reference: "箴言4:20〜27",
-        text: "あなたの心を見守れ。"
+        reference: weeklyData.biblePassage,
+        text: weeklyData.sermonTitle
       },
       hymnStudy: {
-        hymn: "聖歌25・138・567・628・376番",
+        hymn: `聖歌${weeklyData.hymns.join("・")}番`,
         title: `${serviceDateLabel} 主日礼拝賛美`,
         meaning: "主日礼拝の賛美"
       },
@@ -701,55 +782,53 @@
         { name: "公式YouTube", url: "https://www.youtube.com/channel/UCwqc95wswE8wj1voDkejndA", bg: "images/photo5.jpg" }
       ],
       schedules: [
-        { time: "10:00", name: "礼拝前の賛美・祈り" },
-        { time: "10:30", name: "主日礼拝" },
-        ...afternoonSchedule
+        ...weeklyData.schedules
       ],
       slides: [
         {
           tag: `${serviceDateLabel} 主日礼拝`,
-          title: "詩篇112篇1〜6節",
-          sub: "招詞／聖歌25・138・567・628・376",
+          title: weeklyData.invitationPassage,
+          sub: `招詞／聖歌${weeklyData.hymns.join("・")}`,
           kind: "photo-pan",
           bg: "images/photo1.jpg"
         },
         {
           tag: `${serviceDateLabel} 主日礼拝`,
-          title: "箴言4章20〜27節",
-          sub: "説教「あなたの心を見守れ。」",
+          title: weeklyData.biblePassage,
+          sub: `説教「${weeklyData.sermonTitle}」`,
           kind: "photo-pan",
           bg: "images/photo1.jpg"
         },
         {
           tag: `${serviceDateLabel}の行事`,
-          title: "愛餐会・聖書通読と賛美の学び会",
-          sub: "愛餐会：礼拝後／学び会：13:30〜14:30（創世記24章、マタイ24章）",
+          title: weeklyData.schedules.slice(2).map(item => item.name).join("・"),
+          sub: weeklyData.schedules.slice(2).map(item => `${item.time}：${item.name}`).join("／"),
           kind: "photo-pan",
           bg: "images/photo3.jpg"
         },
         {
           tag: `${serviceDateLabel}の行事`,
-          title: "委細面談・環境美化",
-          sub: "委細面談：13:30〜15:00／環境美化：14:30〜16:00",
+          title: "本日の集会・奉仕",
+          sub: weeklyData.schedules.slice(2).map(item => `${item.time}：${item.name}`).join("／"),
           kind: "photo-pan",
           bg: "images/photo5.jpg"
         },
         {
           tag: `${serviceDateLabel}の聖書箇所`,
-          title: "あなたの心を見守れ。",
-          sub: "箴言4章20〜27節",
+          title: weeklyData.sermonTitle,
+          sub: weeklyData.biblePassage,
           bg: "images/album-03.jpg"
         },
         {
           tag: `${serviceDateLabel}の説教`,
-          title: "あなたの心を見守れ。",
-          sub: "説教：尹 秉甲師",
+          title: weeklyData.sermonTitle,
+          sub: `説教：${weeklyData.preacher}`,
           bg: "images/photo1.jpg"
         },
         {
           tag: "お知らせ",
           title: "愛餐会",
-          sub: "礼拝後に行います（祈祷：本間正子姉）",
+          sub: weeklyData.mealPrayer ? `礼拝後に行います（祈祷：${weeklyData.mealPrayer}）` : "礼拝後に行います",
           kind: "photo-pan",
           bg: "images/album-06.jpg"
         },
@@ -798,9 +877,9 @@
           title: "ひたち光教会の写真アルバム",
           sub: "https://photos.app.goo.gl/ESPV7T1gdWkd4iaX8",
           url: "https://photos.app.goo.gl/ESPV7T1gdWkd4iaX8",
-          icon: "images/photos.png",
+          icon: "images/photos.jpg",
           kind: "instagram-scroll",
-          bg: "images/photos.png"
+          bg: "images/photos.jpg"
         },
         {
           tag: "公式リンク",
@@ -814,9 +893,9 @@
         }
       ],
       tickers: [
-        `${serviceDateLabel}の主日礼拝：招詞 詩篇112篇1〜6節／聖書 箴言4章20〜27節。`,
-        "水曜祈祷会は19:00〜20:30です。学びは伝道についてです。",
-        "礼拝後は愛餐会、13:30から聖書通読と賛美の学び会・委細面談、14:30から環境美化を行います。",
+        `${serviceDateLabel}の主日礼拝：招詞 ${weeklyData.invitationPassage}／聖書 ${weeklyData.biblePassage}。`,
+        `説教「${weeklyData.sermonTitle}」${weeklyData.preacher ? `（${weeklyData.preacher}）` : ""}`,
+        `本日の予定：${weeklyData.schedules.slice(2).map(item => `${item.time} ${item.name}`).join("、")}`,
         `今週の週報：${serviceDateFull}`
       ]
     };
@@ -925,10 +1004,63 @@
       slideInterval = setInterval(autoAdvanceSlide, 16000);
     }
 
-    // --- メモリリーク防止（6時間ごとにページリロード） ---
-    setTimeout(() => {
-      location.reload();
-    }, 6 * 60 * 60 * 1000);
+    let displayStatusTimer;
+    function showDisplayStatus(message) {
+      const status = document.getElementById('displayStatus');
+      status.textContent = message;
+      status.hidden = false;
+      clearTimeout(displayStatusTimer);
+      displayStatusTimer = setTimeout(() => {
+        status.hidden = true;
+      }, 8000);
+    }
+
+    async function toggleFullscreen() {
+      const wakeLockRequest = keepScreenAwake();
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        } else if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else {
+          showDisplayStatus('このブラウザーでは全画面表示に対応していません。ブラウザーの全画面ボタンをご利用ください。');
+        }
+      } catch (error) {
+        console.error('全画面表示を切り替えられませんでした。', error);
+        showDisplayStatus('全画面表示にできませんでした。ブラウザーの全画面ボタンをご利用ください。');
+      }
+      await wakeLockRequest;
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      document.getElementById('fullscreenButton').textContent =
+        document.fullscreenElement ? '全画面解除' : '全画面表示';
+    });
+
+    let screenWakeLock = null;
+    async function keepScreenAwake() {
+      if (!navigator.wakeLock) {
+        showDisplayStatus('画面オフ防止に未対応です。Fire TVのスクリーンセーバー設定を「なし」にしてください。');
+        return;
+      }
+      try {
+        const wakeLock = await navigator.wakeLock.request('screen');
+        screenWakeLock = wakeLock;
+        wakeLock.addEventListener('release', () => {
+          if (screenWakeLock === wakeLock) screenWakeLock = null;
+        });
+      } catch (error) {
+        console.error('画面オフ防止を有効にできませんでした。', error);
+        showDisplayStatus('画面オフ防止を有効にできません。Fire TVのスクリーンセーバー設定をご確認ください。');
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && (!screenWakeLock || screenWakeLock.released)) {
+        keepScreenAwake();
+      }
+    });
+    keepScreenAwake();
   </script>
 </body>
 </html>
