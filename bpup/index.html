@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a5f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="聖書ピックアップ">
+  <title>聖書箇所ピックアップ</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- 固定ヘッダー＆コピー済みプレビュー領域 -->
+    <header class="top-panel">
+      <div class="header-row">
+        <h1 class="app-title">📖 聖書ピックアップ</h1>
+        <div class="format-toggle" role="group" aria-label="コピー形式">
+          <button type="button" id="fmtPerVerse" class="fmt-btn active">各節表記</button>
+          <button type="button" id="fmtHeader" class="fmt-btn">見出し+本文</button>
+        </div>
+      </div>
+
+      <!-- パンくずナビゲーション（タップで階層移動） -->
+      <nav class="breadcrumb-bar" aria-label="選択ステップ">
+        <button type="button" id="navBook" class="crumb active">1. 書</button>
+        <span class="crumb-sep">›</span>
+        <button type="button" id="navChapter" class="crumb" disabled>2. 章</button>
+        <span class="crumb-sep">›</span>
+        <button type="button" id="navVerse" class="crumb" disabled>3. 節</button>
+      </nav>
+
+      <!-- コピー状態＆プレビューカード -->
+      <div class="copy-card" id="copyCard">
+        <div class="copy-card-header">
+          <span class="copy-badge" id="copyBadge">節をタップすると自動コピーされます</span>
+          <div class="copy-actions">
+            <button type="button" id="btnKeepPassage" class="action-chip" disabled>＋ 別箇所を追加</button>
+            <button type="button" id="btnClearAll" class="action-chip sub" hidden>クリア</button>
+            <button type="button" id="btnManualCopy" class="action-chip primary" disabled>📋 コピー</button>
+          </div>
+        </div>
+        <div id="keptList" class="kept-list" hidden></div>
+        <div id="previewBox" class="preview-box empty">ここに選択した聖書のことばが表示されます（選択と同時にクリップボードへコピーされます）</div>
+      </div>
+    </header>
+
+    <!-- メイン選択エリア -->
+    <main class="main-content" id="mainContent">
+      <!-- STEP 1: 書名選択 -->
+      <section id="stepBook" class="step-view">
+        <div class="testament-tabs">
+          <button type="button" id="tabOT" class="testament-tab active">旧約聖書</button>
+          <button type="button" id="tabNT" class="testament-tab">新約聖書</button>
+        </div>
+        <div id="bookGridContainer" class="book-categories"></div>
+      </section>
+
+      <!-- STEP 2: 章選択 -->
+      <section id="stepChapter" class="step-view" hidden>
+        <div class="step-header">
+          <button type="button" id="backToBook" class="back-btn">‹ 書一覧</button>
+          <span id="chapterStepTitle" class="step-title"></span>
+        </div>
+        <div id="chapterGrid" class="number-grid"></div>
+      </section>
+
+      <!-- STEP 3: 節選択 -->
+      <section id="stepVerse" class="step-view" hidden>
+        <div class="step-header">
+          <button type="button" id="backToChapter" class="back-btn">‹ 章一覧</button>
+          <span id="verseStepTitle" class="step-title"></span>
+        </div>
+
+        <!-- 単一節 / 複数節範囲 モード切替＆ワンタップ調整バー -->
+        <div class="verse-mode-panel">
+          <div class="verse-mode-tabs" role="group" aria-label="節の選択モード">
+            <button type="button" id="modeSingleBtn" class="verse-mode-tab">1節のみコピー</button>
+            <button type="button" id="modeRangeBtn" class="verse-mode-tab active">範囲コピー (開始→終了)</button>
+          </div>
+          <div class="range-adjust-bar" id="rangeAdjustBar" hidden>
+            <span class="range-current-label" id="rangeCurrentLabel"></span>
+            <div class="range-adjust-btns">
+              <button type="button" id="btnMakeSingle" class="adj-btn" hidden>開始の1節のみ</button>
+              <button type="button" id="btnShrinkEnd" class="adj-btn">−1節</button>
+              <button type="button" id="btnExpandEnd" class="adj-btn">＋1節広げる</button>
+            </div>
+          </div>
+          <p class="verse-hint" id="verseHint">1回目のタップで開始節（即コピー）、2回目のタップで終了節（範囲コピー）になります。</p>
+        </div>
+
+        <div id="verseGrid" class="number-grid verse-number-grid"></div>
+        <div class="verse-list-header">本文をタップしても選択できます</div>
+        <div id="verseTextList" class="verse-text-list"></div>
+      </section>
+    </main>
+
+    <!-- コピー通知トースト -->
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </div>
+
+  <script src="./bible_data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
