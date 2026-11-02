@@ -144,10 +144,8 @@
   let selectedChapter = null;
   let firstVerse = null;
   let lastVerse = null;
-  let verseSelectMode = "range"; // "single" | "range"
   let awaitingEndVerse = false;
-  let maxVerseInCurrentChapter = 1;
-  let copyFormat = "per_verse"; // "per_verse" | "header"
+  let copyFormat = "header"; // "header" | "per_verse"
   let keptPassages = []; // [{ book, chapter, firstVerse, lastVerse }]
   let toastTimer = null;
 
@@ -179,14 +177,6 @@
 
   const backToChapter = document.getElementById("backToChapter");
   const verseStepTitle = document.getElementById("verseStepTitle");
-  const modeSingleBtn = document.getElementById("modeSingleBtn");
-  const modeRangeBtn = document.getElementById("modeRangeBtn");
-  const rangeAdjustBar = document.getElementById("rangeAdjustBar");
-  const rangeCurrentLabel = document.getElementById("rangeCurrentLabel");
-  const btnMakeSingle = document.getElementById("btnMakeSingle");
-  const btnShrinkEnd = document.getElementById("btnShrinkEnd");
-  const btnExpandEnd = document.getElementById("btnExpandEnd");
-  const verseHint = document.getElementById("verseHint");
   const verseGrid = document.getElementById("verseGrid");
   const verseTextList = document.getElementById("verseTextList");
   const toastEl = document.getElementById("toast");
@@ -271,40 +261,9 @@
     }, 2200);
   }
 
-  function updateRangeAdjustBar() {
-    if (firstVerse === null || lastVerse === null) {
-      rangeAdjustBar.hidden = true;
-      return;
-    }
-    rangeAdjustBar.hidden = false;
-    if (firstVerse === lastVerse) {
-      rangeCurrentLabel.textContent = `選択中: ${firstVerse}節`;
-      btnMakeSingle.hidden = true;
-      btnShrinkEnd.disabled = true;
-    } else {
-      rangeCurrentLabel.textContent = `選択中: ${firstVerse}〜${lastVerse}節 (${lastVerse - firstVerse + 1}節分)`;
-      btnMakeSingle.hidden = false;
-      btnShrinkEnd.disabled = false;
-    }
-    btnExpandEnd.disabled = lastVerse >= maxVerseInCurrentChapter;
-  }
-
-  function updateVerseModeHint() {
-    if (verseSelectMode === "single") {
-      verseHint.textContent = "タップした節を1節ずつ即コピーします（「＋1節広げる」で範囲にもできます）。";
-    } else if (firstVerse === null) {
-      verseHint.textContent = "1回目のタップで開始節（即コピー）、2回目のタップで終了節（範囲コピー）になります。";
-    } else if (awaitingEndVerse) {
-      verseHint.textContent = `${firstVerse}節をコピー済！続けて終了節をタップすると範囲コピーになります。`;
-    } else {
-      verseHint.textContent = `${firstVerse}〜${lastVerse}節を範囲コピー済（別の節をタップすると新しく選び直せます）。`;
-    }
-  }
-
   function syncPreviewAndCopy(triggerToast = true) {
     const passages = getActivePassages();
     renderKeptTags();
-    updateRangeAdjustBar();
 
     if (passages.length === 0) {
       copyCard.classList.remove("copied");
@@ -454,8 +413,6 @@
     awaitingEndVerse = false;
 
     renderVerses();
-    updateRangeAdjustBar();
-    updateVerseModeHint();
     showStep("verse");
   }
 
@@ -466,7 +423,6 @@
       .map(Number)
       .sort((a, b) => a - b);
 
-    maxVerseInCurrentChapter = verses.length > 0 ? verses[verses.length - 1] : 1;
     verseStepTitle.textContent = `${selectedBook} ${selectedChapter}章`;
     verseGrid.innerHTML = "";
     verseTextList.innerHTML = "";
@@ -500,30 +456,23 @@
   }
 
   function onVerseTap(v) {
-    if (verseSelectMode === "single") {
+    if (firstVerse === null || !awaitingEndVerse) {
       firstVerse = v;
       lastVerse = v;
-      awaitingEndVerse = false;
+      awaitingEndVerse = true;
     } else {
-      if (firstVerse === null || !awaitingEndVerse) {
-        firstVerse = v;
+      if (v === firstVerse) {
+        awaitingEndVerse = false;
+      } else if (v > firstVerse) {
         lastVerse = v;
-        awaitingEndVerse = true;
+        awaitingEndVerse = false;
       } else {
-        if (v === firstVerse) {
-          awaitingEndVerse = false;
-        } else if (v > firstVerse) {
-          lastVerse = v;
-          awaitingEndVerse = false;
-        } else {
-          lastVerse = firstVerse;
-          firstVerse = v;
-          awaitingEndVerse = false;
-        }
+        lastVerse = firstVerse;
+        firstVerse = v;
+        awaitingEndVerse = false;
       }
     }
 
-    updateVerseModeHint();
     updateBreadcrumbs("verse");
     updateVerseHighlight();
     syncPreviewAndCopy(true);
@@ -545,65 +494,6 @@
       row.classList.toggle("range-edge", isEdge(v));
     });
   }
-
-  // モード切替イベント
-  modeSingleBtn.addEventListener("click", () => {
-    verseSelectMode = "single";
-    awaitingEndVerse = false;
-    modeSingleBtn.classList.add("active");
-    modeRangeBtn.classList.remove("active");
-    if (firstVerse !== null && lastVerse !== firstVerse) {
-      lastVerse = firstVerse;
-      updateBreadcrumbs("verse");
-      updateVerseHighlight();
-      syncPreviewAndCopy(true);
-    }
-    updateVerseModeHint();
-  });
-
-  modeRangeBtn.addEventListener("click", () => {
-    verseSelectMode = "range";
-    modeRangeBtn.classList.add("active");
-    modeSingleBtn.classList.remove("active");
-    if (firstVerse !== null && firstVerse === lastVerse) {
-      awaitingEndVerse = true;
-    }
-    updateVerseModeHint();
-  });
-
-  // 範囲のワンタップ微調整ボタン
-  btnMakeSingle.addEventListener("click", () => {
-    if (firstVerse !== null) {
-      lastVerse = firstVerse;
-      awaitingEndVerse = verseSelectMode === "range";
-      updateVerseModeHint();
-      updateBreadcrumbs("verse");
-      updateVerseHighlight();
-      syncPreviewAndCopy(true);
-    }
-  });
-
-  btnShrinkEnd.addEventListener("click", () => {
-    if (firstVerse !== null && lastVerse !== null && lastVerse > firstVerse) {
-      lastVerse -= 1;
-      awaitingEndVerse = false;
-      updateVerseModeHint();
-      updateBreadcrumbs("verse");
-      updateVerseHighlight();
-      syncPreviewAndCopy(true);
-    }
-  });
-
-  btnExpandEnd.addEventListener("click", () => {
-    if (firstVerse !== null && lastVerse !== null && lastVerse < maxVerseInCurrentChapter) {
-      lastVerse += 1;
-      awaitingEndVerse = false;
-      updateVerseModeHint();
-      updateBreadcrumbs("verse");
-      updateVerseHighlight();
-      syncPreviewAndCopy(true);
-    }
-  });
 
   // 画面遷移イベント
   tabOT.addEventListener("click", () => {
@@ -675,7 +565,6 @@
     lastVerse = null;
     awaitingEndVerse = false;
     updateVerseHighlight();
-    updateVerseModeHint();
     updateBreadcrumbs(!stepVerse.hidden ? "verse" : !stepChapter.hidden ? "chapter" : "book");
     syncPreviewAndCopy(false);
     showToast("選択をクリアしました");
