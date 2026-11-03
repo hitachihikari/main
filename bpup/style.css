@@ -232,18 +232,45 @@ html, body {
 }
 
 .preview-box {
-  font-size: 0.85rem;
-  min-height: 76px;
-  max-height: 152px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  max-height: 84px;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
   color: var(--text);
+  transition: min-height 0.18s ease, max-height 0.18s ease;
+}
+
+.preview-box.expanded {
+  min-height: calc(100dvh - 210px);
+  max-height: calc(100dvh - 210px);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  padding: 4px 2px;
 }
 
 .preview-box.empty {
   color: var(--text-muted);
   font-size: 0.8rem;
+}
+
+.expand-toggle-btn {
+  margin-top: 6px;
+  width: 100%;
+  border: 1px solid var(--copied-border);
+  background: var(--surface);
+  color: var(--copied-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.expand-toggle-btn:active {
+  opacity: 0.8;
 }
 
 /* メイン選択エリア */

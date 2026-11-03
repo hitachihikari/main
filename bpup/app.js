@@ -145,6 +145,7 @@
   let firstVerse = null;
   let lastVerse = null;
   let awaitingEndVerse = false;
+  let isPreviewExpanded = false;
   let copyFormat = "header"; // "header" | "per_verse"
   let keptPassages = []; // [{ book, chapter, firstVerse, lastVerse }]
   let toastTimer = null;
@@ -162,6 +163,7 @@
   const btnManualCopy = document.getElementById("btnManualCopy");
   const keptListEl = document.getElementById("keptList");
   const previewBox = document.getElementById("previewBox");
+  const btnToggleExpand = document.getElementById("btnToggleExpand");
 
   const stepBook = document.getElementById("stepBook");
   const stepChapter = document.getElementById("stepChapter");
@@ -261,6 +263,18 @@
     }, 2200);
   }
 
+  function setPreviewExpanded(expanded) {
+    isPreviewExpanded = Boolean(expanded);
+    previewBox.classList.toggle("expanded", isPreviewExpanded);
+    if (isPreviewExpanded) {
+      btnToggleExpand.textContent = "▲ 閉じて節を選び直す";
+    } else {
+      btnToggleExpand.textContent = awaitingEndVerse
+        ? "▼ 画面いっぱいに広げる（1節のみ表示）"
+        : "▼ 画面いっぱいに広げる";
+    }
+  }
+
   function syncPreviewAndCopy(triggerToast = true) {
     const passages = getActivePassages();
     renderKeptTags();
@@ -270,6 +284,8 @@
       copyBadge.textContent = "節をタップすると自動コピーされます";
       previewBox.textContent = "ここに選択した聖書のことばが表示されます（選択と同時にクリップボードへコピーされます）";
       previewBox.classList.add("empty");
+      setPreviewExpanded(false);
+      btnToggleExpand.hidden = true;
       btnKeepPassage.disabled = true;
       btnManualCopy.disabled = true;
       btnClearAll.hidden = true;
@@ -289,6 +305,8 @@
     copyBadge.textContent = `✓ コピー済み：${refSummary}`;
     previewBox.textContent = fullText;
     previewBox.classList.remove("empty");
+    btnToggleExpand.hidden = false;
+    setPreviewExpanded(isPreviewExpanded);
 
     const hasCurrentSelection = selectedBook && selectedChapter && firstVerse !== null;
     btnKeepPassage.disabled = !hasCurrentSelection;
@@ -346,6 +364,7 @@
     stepBook.hidden = step !== "book";
     stepChapter.hidden = step !== "chapter";
     stepVerse.hidden = step !== "verse";
+    setPreviewExpanded(false);
     updateBreadcrumbs(step);
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -460,6 +479,7 @@
       firstVerse = v;
       lastVerse = v;
       awaitingEndVerse = true;
+      isPreviewExpanded = false;
     } else {
       if (v === firstVerse) {
         awaitingEndVerse = false;
@@ -471,11 +491,15 @@
         firstVerse = v;
         awaitingEndVerse = false;
       }
+      isPreviewExpanded = true;
     }
 
     updateBreadcrumbs("verse");
     updateVerseHighlight();
     syncPreviewAndCopy(true);
+    if (isPreviewExpanded) {
+      previewBox.scrollTop = 0;
+    }
   }
 
   function updateVerseHighlight() {
@@ -572,6 +596,10 @@
 
   btnManualCopy.addEventListener("click", () => {
     syncPreviewAndCopy(true);
+  });
+
+  btnToggleExpand.addEventListener("click", () => {
+    setPreviewExpanded(!isPreviewExpanded);
   });
 
   fmtPerVerseBtn.addEventListener("click", () => {
