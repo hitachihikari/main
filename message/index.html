@@ -44,6 +44,13 @@
 	<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
 	<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+	<script>
+		if (window.pdfjsLib) {
+			window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+		}
+	</script>
 
 	<script type="module">
     	import TinySegmenter from "https://esm.sh/tiny-segmenter@0.2.0";
@@ -361,6 +368,95 @@
 		.revealed {
 			font-weight: bold;
 		}
+		#sermonSummary > h3 {
+			margin-bottom: 0.25rem !important;
+		}
+		#pptSwiper .swiper-slide {
+			min-height: 0;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: #f8f9fa;
+		}
+		.ppt-canvas {
+			width: 100%;
+			height: auto;
+			display: block;
+		}
+		.md-scroll-box {
+			max-height: 680px;
+			overflow-y: auto;
+			background-color: #fff;
+			line-height: 1.75;
+		}
+
+		.md-scroll-box h1 {
+			font-size: 1.4rem;
+			font-weight: 700;
+			margin-top: 0.25rem;
+			margin-bottom: 1rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 2px solid #dee2e6;
+		}
+
+		.md-scroll-box h2 {
+			font-size: 1.2rem;
+			font-weight: 700;
+			color: #0d6efd;
+			margin-top: 1.25rem;
+			margin-bottom: 0.75rem;
+		}
+
+		#message-tab-pane > section .md-scroll-box h3 {
+			font-size: 1.05rem;
+			font-weight: 600;
+			color: #343a40;
+			margin-top: 1rem;
+			margin-bottom: 0.5rem !important;
+		}
+
+		.md-scroll-box blockquote {
+			border-left: 4px solid #0d6efd;
+			background-color: #f8f9fa;
+			padding: 0.5rem 1rem;
+			margin: 0.75rem 0;
+			color: #495057;
+			border-radius: 0 0.25rem 0.25rem 0;
+		}
+
+		.md-scroll-box blockquote p:last-child {
+			margin-bottom: 0;
+		}
+
+		.md-scroll-box ul,
+		.md-scroll-box ol {
+			padding-left: 1.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.md-scroll-box li {
+			margin-bottom: 0.5rem;
+		}
+
+		@media (max-width: 575.98px) {
+			.md-scroll-box {
+				max-height: 540px;
+				font-size: 0.95rem;
+			}
+
+			.md-scroll-box h1 {
+				font-size: 1.25rem;
+			}
+
+			.md-scroll-box h2 {
+				font-size: 1.1rem;
+			}
+
+			#message-tab-pane > section .md-scroll-box h3 {
+				font-size: 1rem;
+			}
+		}
 	</style>
 </head>
 
@@ -446,19 +542,32 @@
 					<div class="col-2"><button class="btn btn-hhc" onclick="move(3600)">60分</button></div>
 				</div>
 
-				<section id="pptContainer" class="mb-4">
-					<h3 class="h4 mb-3">📽 礼拝スライド</h3>
-					<div style="max-width: 1000px; margin: auto; aspect-ratio: 4 / 3; position: relative;">
-						<!-- ローディング表示 -->
-						<div id="pptLoading" class="d-flex justify-content-center align-items-center"
-							style="position: absolute; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1;">
-							<span class="spinner-border text-primary" role="status" aria-hidden="true"></span>
-							<span class="ms-2">読み込み中...</span>
-						</div>
+				<!-- 説教要約（NotebookLM） -->
+				<section id="sermonSummary" class="mb-4">
+					<h3 class="h4 mb-1">📝 説教要約（NotebookLM）</h3>
+					<p class="text-muted small mb-2">※AIによる自動生成なので、おかしい点はご連絡ください。</p>
+					<div id="mdContent" class="md-scroll-box border rounded p-3">
+						<p class="text-muted mb-0">読み込み中...</p>
+					</div>
+				</section>
 
-						<iframe id="pptFrame" src="" allowfullscreen
-							style="position: absolute; width: 100%; height: 100%; border: none; z-index: 2;">
-						</iframe>
+				<section id="pptContainer" class="mb-4">
+					<div class="d-flex justify-content-between align-items-center mb-3">
+						<h3 class="h4 mb-0">📽 礼拝スライド</h3>
+						<a id="pptDownloadLink" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary rounded-pill px-3" style="display: none;">
+							📄 PDFを別タブで開く
+						</a>
+					</div>
+					<div id="pptStatus" class="border rounded p-3 text-muted bg-white">
+						読み込み中...
+					</div>
+					<div id="pptViewerWrapper" class="border rounded overflow-hidden bg-light" style="max-width: 1000px; margin: auto; display: none;">
+						<div class="swiper" id="pptSwiper">
+							<div class="swiper-wrapper" id="pptSlides"></div>
+							<div class="swiper-button-prev" id="pptPrev"></div>
+							<div class="swiper-button-next" id="pptNext"></div>
+						</div>
+						<div id="pptPagination" class="text-center py-2 bg-white border-top fw-semibold text-secondary"></div>
 					</div>
 				</section>
 
@@ -535,12 +644,6 @@
 
 			document.addEventListener("DOMContentLoaded", () => {
 				applyFontSize();
-				const pptFrame = document.getElementById("pptFrame");
-				const pptLoader = document.getElementById("pptLoading");
-				pptFrame.addEventListener("load", () => {
-					pptLoader.style.display = "none";
-				});
-				pptFrame.src = "https://onedrive.live.com/embed?cid=DF8117155F580907&resid=DF8117155F580907%211340&authkey=AF6P8Ar7u7YupbA&em=2&wdAr=1.00&wdEaa=0";
 
 				fetch("./list.json")
 					.then(res => {
@@ -705,6 +808,8 @@
 				if (!select.value) return;
 
 				const selaudio = select.value.substring(0, 8);  // ←重要
+				loadMarkdownSummary(selaudio);
+				loadPdfSlides(selaudio);
 				const previousAudio = document.getElementById("audio");
 				if (previousAudio) previousAudio.pause();
 				const audio = new Audio("./m4a/" + selaudio + ".m4a");
@@ -761,6 +866,156 @@
 						audio.pause();
 					}
 				};
+			}
+
+			function loadMarkdownSummary(selaudio) {
+				const mdContent = document.getElementById("mdContent");
+				if (!mdContent) return;
+
+				mdContent.innerHTML = '<p class="text-muted mb-0">読み込み中...</p>';
+				mdContent.scrollTop = 0;
+
+				fetch("./md/" + selaudio + ".md", { cache: "no-cache" })
+					.then(res => {
+						if (!res.ok) throw new Error(`MD not found (${res.status})`);
+						const contentType = res.headers.get("content-type") || "";
+						if (contentType.includes("text/html")) {
+							throw new Error("Unexpected HTML response");
+						}
+						return res.text();
+					})
+					.then(mdText => {
+						const select = document.getElementById("messageSelect");
+						if (select && select.value.substring(0, 8) !== selaudio) return;
+
+						if (!mdText.trim() || mdText.trim().startsWith("<!DOCTYPE html")) {
+							throw new Error("Empty or HTML fallback");
+						}
+
+						if (typeof marked !== "undefined" && typeof marked.parse === "function") {
+							mdContent.innerHTML = marked.parse(mdText);
+						} else {
+							mdContent.innerHTML = `<div style="white-space: pre-wrap;">${escapeHtml(mdText)}</div>`;
+						}
+						mdContent.scrollTop = 0;
+					})
+					.catch(() => {
+						const select = document.getElementById("messageSelect");
+						if (select && select.value.substring(0, 8) !== selaudio) return;
+						mdContent.innerHTML = '<p class="text-muted mb-0">この説教の要約はありません。</p>';
+					});
+			}
+
+			let pptSwiperInstance = null;
+			let currentPdfLoadingTask = null;
+
+			async function loadPdfSlides(selaudio) {
+				const pptStatus = document.getElementById("pptStatus");
+				const pptViewerWrapper = document.getElementById("pptViewerWrapper");
+				const pptSlides = document.getElementById("pptSlides");
+				const pptDownloadLink = document.getElementById("pptDownloadLink");
+				if (!pptStatus || !pptViewerWrapper || !pptSlides) return;
+
+				if (currentPdfLoadingTask) {
+					try { currentPdfLoadingTask.destroy(); } catch (e) {}
+					currentPdfLoadingTask = null;
+				}
+				if (pptSwiperInstance) {
+					pptSwiperInstance.destroy(true, true);
+					pptSwiperInstance = null;
+				}
+
+				pptSlides.innerHTML = "";
+				pptViewerWrapper.style.display = "none";
+				if (pptDownloadLink) pptDownloadLink.style.display = "none";
+				pptStatus.style.display = "block";
+				pptStatus.innerHTML = '<span class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></span>読み込み中...';
+
+				const pdfUrl = "./pdf/" + selaudio + ".pdf";
+
+				try {
+					const res = await fetch(pdfUrl, { cache: "no-cache" });
+					if (!res.ok) throw new Error(`PDF not found (${res.status})`);
+					const contentType = res.headers.get("content-type") || "";
+					if (contentType.includes("text/html")) {
+						throw new Error("Unexpected HTML response");
+					}
+
+					const arrayBuffer = await res.arrayBuffer();
+					const select = document.getElementById("messageSelect");
+					if (select && select.value.substring(0, 8) !== selaudio) return;
+
+					if (!window.pdfjsLib) {
+						pptStatus.innerHTML = `<a href="${pdfUrl}" target="_blank" rel="noopener" class="btn btn-outline-primary">📄 スライドPDFを開く</a>`;
+						return;
+					}
+
+					const loadingTask = window.pdfjsLib.getDocument({
+						data: arrayBuffer,
+						cMapUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/",
+						cMapPacked: true
+					});
+					currentPdfLoadingTask = loadingTask;
+
+					const pdf = await loadingTask.promise;
+					if (select && select.value.substring(0, 8) !== selaudio) return;
+
+					const canvases = [];
+					for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+						const slide = document.createElement("div");
+						slide.className = "swiper-slide";
+						const canvas = document.createElement("canvas");
+						canvas.className = "ppt-canvas";
+						slide.appendChild(canvas);
+						pptSlides.appendChild(slide);
+						canvases.push({ pageNum, canvas });
+					}
+
+					pptStatus.style.display = "none";
+					pptViewerWrapper.style.display = "block";
+					if (pptDownloadLink) {
+						pptDownloadLink.href = pdfUrl;
+						pptDownloadLink.style.display = "inline-block";
+					}
+
+					pptSwiperInstance = new Swiper("#pptSwiper", {
+						direction: "horizontal",
+						loop: false,
+						autoHeight: true,
+						pagination: {
+							el: "#pptPagination",
+							type: "fraction"
+						},
+						navigation: {
+							nextEl: "#pptNext",
+							prevEl: "#pptPrev"
+						}
+					});
+
+					for (const { pageNum, canvas } of canvases) {
+						if (select && select.value.substring(0, 8) !== selaudio) return;
+						const page = await pdf.getPage(pageNum);
+						const baseViewport = page.getViewport({ scale: 1 });
+						const targetWidth = Math.min(1200, (pptViewerWrapper.clientWidth || 800) * Math.min(window.devicePixelRatio || 1, 2));
+						const scale = targetWidth / baseViewport.width;
+						const viewport = page.getViewport({ scale });
+
+						canvas.width = viewport.width;
+						canvas.height = viewport.height;
+						const ctx = canvas.getContext("2d");
+						await page.render({ canvasContext: ctx, viewport }).promise;
+						if (pageNum === 1 && pptSwiperInstance) {
+							pptSwiperInstance.updateAutoHeight();
+						}
+					}
+				} catch (err) {
+					const select = document.getElementById("messageSelect");
+					if (select && select.value.substring(0, 8) !== selaudio) return;
+					pptViewerWrapper.style.display = "none";
+					if (pptDownloadLink) pptDownloadLink.style.display = "none";
+					pptStatus.style.display = "block";
+					pptStatus.textContent = "この説教のスライドはありません。";
+				}
 			}
 
 			function skip(seconds) {
