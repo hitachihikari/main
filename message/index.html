@@ -553,7 +553,7 @@
 
 				<section id="pptContainer" class="mb-4">
 					<div class="d-flex justify-content-between align-items-center mb-3">
-						<h3 class="h4 mb-0">📽 礼拝スライド</h3>
+						<h3 class="h4 mb-0">📽 礼拝スライド <span id="pptDateBadge" class="fs-6 text-muted fw-normal"></span></h3>
 						<a id="pptDownloadLink" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary rounded-pill px-3" style="display: none;">
 							📄 PDFを別タブで開く
 						</a>
@@ -660,8 +660,8 @@
 							select.appendChild(opt);
 						}
 
-						audioset();  // 最初の説教を表示
-						select.addEventListener("change", audioset);  // 説教変更時に呼び出す
+						audioset(true);  // 最初は最新タイムスタンプのPDFを表示
+						select.addEventListener("change", () => audioset(false));  // 説教変更時は選択した日付のPDFを表示
 					})
 					.catch(error => console.error("説教リストの読み込みエラー:", error));
 
@@ -803,13 +803,17 @@
 
 
 
-			function audioset() {
+			function audioset(isInitial = false) {
 				const select = document.getElementById("messageSelect");
 				if (!select.value) return;
 
 				const selaudio = select.value.substring(0, 8);  // ←重要
 				loadMarkdownSummary(selaudio);
-				loadPdfSlides(selaudio);
+				if (isInitial === true) {
+					loadLatestPdfSlides(selaudio);
+				} else {
+					loadPdfSlides(selaudio);
+				}
 				const previousAudio = document.getElementById("audio");
 				if (previousAudio) previousAudio.pause();
 				const audio = new Audio("./m4a/" + selaudio + ".m4a");
@@ -908,12 +912,112 @@
 
 			let pptSwiperInstance = null;
 			let currentPdfLoadingTask = null;
+			let pdfRequestId = 0;
 
-			async function loadPdfSlides(selaudio) {
+			function formatDateYYYYMMDD(date) {
+				const y = date.getFullYear();
+				const m = String(date.getMonth() + 1).padStart(2, "0");
+				const d = String(date.getDate()).padStart(2, "0");
+				return `${y}${m}${d}`;
+			}
+
+			async function findLatestPdfDate(fallbackDate) {
+				// 1. ディレクトリ一覧が取得できる環境ではその中から最新のYYYYMMDD.pdfを採用
+				try {
+					const dirRes = await fetch("./pdf/", { cache: "no-cache" });
+					if (dirRes.ok) {
+						const text = await dirRes.text();
+						const matches = [...text.matchAll(/(\d{8})\.pdf/gi)].map(m => m[1]);
+						if (matches.length > 0) {
+							matches.sort().reverse();
+							return matches[0];
+						}
+					}
+				} catch (e) {}
+
+				// 2. 現在日時から候補日（直近・週末〜list.json先頭日付まで）を新しい順に探索
+				const candidateSet = new Set();
+				const now = new Date();
+
+				for (let offset = 2; offset >= -14; offset--) {
+					const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+					candidateSet.add(formatDateYYYYMMDD(d));
+				}
+
+				if (fallbackDate && /^\d{8}$/.test(fallbackDate)) {
+					const fy = parseInt(fallbackDate.substring(0, 4), 10);
+					const fm = parseInt(fallbackDate.substring(4, 6), 10) - 1;
+					const fd = parseInt(fallbackDate.substring(6, 8), 10);
+					const fallbackTime = new Date(fy, fm, fd).getTime();
+
+					const cursor = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 6);
+					cursor.setDate(cursor.getDate() - cursor.getDay());
+					let safety = 0;
+					while (cursor.getTime() >= fallbackTime && safety < 52) {
+						candidateSet.add(formatDateYYYYMMDD(cursor));
+						cursor.setDate(cursor.getDate() - 7);
+						safety++;
+					}
+					candidateSet.add(fallbackDate);
+				}
+
+				const candidates = [...candidateSet]
+					.filter(d => !fallbackDate || d >= fallbackDate)
+					.sort()
+					.reverse();
+
+				const checks = await Promise.all(
+					candidates.map(async (dateStr) => {
+						try {
+							let res = await fetch("./pdf/" + dateStr + ".pdf", {
+								method: "HEAD",
+								cache: "no-cache"
+							});
+							if (res.status === 405) {
+								res = await fetch("./pdf/" + dateStr + ".pdf", {
+									headers: { Range: "bytes=0-0" },
+									cache: "no-cache"
+								});
+							}
+							const contentType = res.headers.get("content-type") || "";
+							if (res.ok && !contentType.includes("text/html")) {
+								return dateStr;
+							}
+						} catch (e) {}
+						return null;
+					})
+				);
+
+				const found = checks.find(Boolean);
+				return found || fallbackDate;
+			}
+
+			async function loadLatestPdfSlides(fallbackDate) {
+				const reqId = ++pdfRequestId;
+				const pptStatus = document.getElementById("pptStatus");
+				const pptViewerWrapper = document.getElementById("pptViewerWrapper");
+				const pptDownloadLink = document.getElementById("pptDownloadLink");
+				const pptDateBadge = document.getElementById("pptDateBadge");
+				if (pptViewerWrapper) pptViewerWrapper.style.display = "none";
+				if (pptDownloadLink) pptDownloadLink.style.display = "none";
+				if (pptDateBadge) pptDateBadge.textContent = "";
+				if (pptStatus) {
+					pptStatus.style.display = "block";
+					pptStatus.innerHTML = '<span class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></span>最新スライドを確認中...';
+				}
+
+				const latestDate = await findLatestPdfDate(fallbackDate);
+				if (reqId !== pdfRequestId) return;
+				await loadPdfSlides(latestDate, reqId);
+			}
+
+			async function loadPdfSlides(selaudio, existingReqId = null) {
+				const reqId = existingReqId !== null ? existingReqId : ++pdfRequestId;
 				const pptStatus = document.getElementById("pptStatus");
 				const pptViewerWrapper = document.getElementById("pptViewerWrapper");
 				const pptSlides = document.getElementById("pptSlides");
 				const pptDownloadLink = document.getElementById("pptDownloadLink");
+				const pptDateBadge = document.getElementById("pptDateBadge");
 				if (!pptStatus || !pptViewerWrapper || !pptSlides) return;
 
 				if (currentPdfLoadingTask) {
@@ -928,6 +1032,7 @@
 				pptSlides.innerHTML = "";
 				pptViewerWrapper.style.display = "none";
 				if (pptDownloadLink) pptDownloadLink.style.display = "none";
+				if (pptDateBadge) pptDateBadge.textContent = selaudio ? `（${selaudio}）` : "";
 				pptStatus.style.display = "block";
 				pptStatus.innerHTML = '<span class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></span>読み込み中...';
 
@@ -942,8 +1047,7 @@
 					}
 
 					const arrayBuffer = await res.arrayBuffer();
-					const select = document.getElementById("messageSelect");
-					if (select && select.value.substring(0, 8) !== selaudio) return;
+					if (reqId !== pdfRequestId) return;
 
 					if (!window.pdfjsLib) {
 						pptStatus.innerHTML = `<a href="${pdfUrl}" target="_blank" rel="noopener" class="btn btn-outline-primary">📄 スライドPDFを開く</a>`;
@@ -958,7 +1062,7 @@
 					currentPdfLoadingTask = loadingTask;
 
 					const pdf = await loadingTask.promise;
-					if (select && select.value.substring(0, 8) !== selaudio) return;
+					if (reqId !== pdfRequestId) return;
 
 					const canvases = [];
 					for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -993,7 +1097,7 @@
 					});
 
 					for (const { pageNum, canvas } of canvases) {
-						if (select && select.value.substring(0, 8) !== selaudio) return;
+						if (reqId !== pdfRequestId) return;
 						const page = await pdf.getPage(pageNum);
 						const baseViewport = page.getViewport({ scale: 1 });
 						const targetWidth = Math.min(1200, (pptViewerWrapper.clientWidth || 800) * Math.min(window.devicePixelRatio || 1, 2));
@@ -1009,8 +1113,7 @@
 						}
 					}
 				} catch (err) {
-					const select = document.getElementById("messageSelect");
-					if (select && select.value.substring(0, 8) !== selaudio) return;
+					if (reqId !== pdfRequestId) return;
 					pptViewerWrapper.style.display = "none";
 					if (pptDownloadLink) pptDownloadLink.style.display = "none";
 					pptStatus.style.display = "block";
