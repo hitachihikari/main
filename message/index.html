@@ -44,7 +44,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
 	<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 	<script>
 		if (window.pdfjsLib) {
@@ -368,9 +367,6 @@
 		.revealed {
 			font-weight: bold;
 		}
-		#sermonSummary > h3 {
-			margin-bottom: 0.25rem !important;
-		}
 		#pptSwiper .swiper-slide {
 			min-height: 0;
 			padding: 0;
@@ -383,79 +379,6 @@
 			width: 100%;
 			height: auto;
 			display: block;
-		}
-		.md-scroll-box {
-			max-height: 680px;
-			overflow-y: auto;
-			background-color: #fff;
-			line-height: 1.75;
-		}
-
-		.md-scroll-box h1 {
-			font-size: 1.4rem;
-			font-weight: 700;
-			margin-top: 0.25rem;
-			margin-bottom: 1rem;
-			padding-bottom: 0.5rem;
-			border-bottom: 2px solid #dee2e6;
-		}
-
-		.md-scroll-box h2 {
-			font-size: 1.2rem;
-			font-weight: 700;
-			color: #0d6efd;
-			margin-top: 1.25rem;
-			margin-bottom: 0.75rem;
-		}
-
-		#message-tab-pane > section .md-scroll-box h3 {
-			font-size: 1.05rem;
-			font-weight: 600;
-			color: #343a40;
-			margin-top: 1rem;
-			margin-bottom: 0.5rem !important;
-		}
-
-		.md-scroll-box blockquote {
-			border-left: 4px solid #0d6efd;
-			background-color: #f8f9fa;
-			padding: 0.5rem 1rem;
-			margin: 0.75rem 0;
-			color: #495057;
-			border-radius: 0 0.25rem 0.25rem 0;
-		}
-
-		.md-scroll-box blockquote p:last-child {
-			margin-bottom: 0;
-		}
-
-		.md-scroll-box ul,
-		.md-scroll-box ol {
-			padding-left: 1.5rem;
-			margin-bottom: 1rem;
-		}
-
-		.md-scroll-box li {
-			margin-bottom: 0.5rem;
-		}
-
-		@media (max-width: 575.98px) {
-			.md-scroll-box {
-				max-height: 540px;
-				font-size: 0.95rem;
-			}
-
-			.md-scroll-box h1 {
-				font-size: 1.25rem;
-			}
-
-			.md-scroll-box h2 {
-				font-size: 1.1rem;
-			}
-
-			#message-tab-pane > section .md-scroll-box h3 {
-				font-size: 1rem;
-			}
 		}
 	</style>
 </head>
@@ -541,15 +464,6 @@
 					<div class="col-2"><button class="btn btn-hhc" onclick="move(3000)">50分</button></div>
 					<div class="col-2"><button class="btn btn-hhc" onclick="move(3600)">60分</button></div>
 				</div>
-
-				<!-- 説教要約（NotebookLM） -->
-				<section id="sermonSummary" class="mb-4">
-					<h3 class="h4 mb-1">📝 説教要約（NotebookLM）</h3>
-					<p class="text-muted small mb-2">※AIによる自動生成なので、おかしい点はご連絡ください。</p>
-					<div id="mdContent" class="md-scroll-box border rounded p-3">
-						<p class="text-muted mb-0">読み込み中...</p>
-					</div>
-				</section>
 
 				<section id="pptContainer" class="mb-4">
 					<div class="d-flex justify-content-between align-items-center mb-3">
@@ -808,7 +722,6 @@
 				if (!select.value) return;
 
 				const selaudio = select.value.substring(0, 8);  // ←重要
-				loadMarkdownSummary(selaudio);
 				if (isInitial === true) {
 					loadLatestPdfSlides(selaudio);
 				} else {
@@ -870,44 +783,6 @@
 						audio.pause();
 					}
 				};
-			}
-
-			function loadMarkdownSummary(selaudio) {
-				const mdContent = document.getElementById("mdContent");
-				if (!mdContent) return;
-
-				mdContent.innerHTML = '<p class="text-muted mb-0">読み込み中...</p>';
-				mdContent.scrollTop = 0;
-
-				fetch("./md/" + selaudio + ".md", { cache: "no-cache" })
-					.then(res => {
-						if (!res.ok) throw new Error(`MD not found (${res.status})`);
-						const contentType = res.headers.get("content-type") || "";
-						if (contentType.includes("text/html")) {
-							throw new Error("Unexpected HTML response");
-						}
-						return res.text();
-					})
-					.then(mdText => {
-						const select = document.getElementById("messageSelect");
-						if (select && select.value.substring(0, 8) !== selaudio) return;
-
-						if (!mdText.trim() || mdText.trim().startsWith("<!DOCTYPE html")) {
-							throw new Error("Empty or HTML fallback");
-						}
-
-						if (typeof marked !== "undefined" && typeof marked.parse === "function") {
-							mdContent.innerHTML = marked.parse(mdText);
-						} else {
-							mdContent.innerHTML = `<div style="white-space: pre-wrap;">${escapeHtml(mdText)}</div>`;
-						}
-						mdContent.scrollTop = 0;
-					})
-					.catch(() => {
-						const select = document.getElementById("messageSelect");
-						if (select && select.value.substring(0, 8) !== selaudio) return;
-						mdContent.innerHTML = '<p class="text-muted mb-0">この説教の要約はありません。</p>';
-					});
 			}
 
 			let pptSwiperInstance = null;

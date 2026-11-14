@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hhc-cache-20261103-3';
+const CACHE_NAME = 'hhc-cache-20261115-2';
 const urlsToCache = [
   './',
   './index.html',
@@ -31,7 +31,7 @@ self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
   const isAppNavigation = event.request.mode === 'navigate';
   const isSermonList = requestUrl.origin === self.location.origin
-    && (requestUrl.pathname.endsWith('/list.json') || (requestUrl.pathname.includes('/md/') && requestUrl.pathname.endsWith('.md')));
+    && (requestUrl.pathname.endsWith('/list.json') || (requestUrl.pathname.includes('/pdf/') && requestUrl.pathname.endsWith('.pdf')));
 
   if (isAppNavigation || isSermonList) {
     event.respondWith(
