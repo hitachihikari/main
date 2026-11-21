@@ -108,6 +108,16 @@
     .display-status[hidden] {
       display: none;
     }
+    .keep-awake-video {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 1px;
+      height: 1px;
+      opacity: 0.01;
+      pointer-events: none;
+      z-index: 1;
+    }
     .brand-logo {
       position: absolute;
       top: 30px;
@@ -545,6 +555,18 @@
     </div>
   </div>
   <div class="display-status" id="displayStatus" role="status" aria-live="polite" hidden></div>
+  <video
+    class="keep-awake-video"
+    id="keepAwakeVideo"
+    muted
+    loop
+    playsinline
+    autoplay
+    disablepictureinpicture
+    tabindex="-1"
+    aria-hidden="true"
+    src="data:video/mp4;base64,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"
+  ></video>
 
   <!-- 右サイドバー：固定情報 -->
   <div class="sidebar">
@@ -578,19 +600,19 @@
 
     // BEGIN GENERATED WEEKLY DATA
     const weeklyData = {
-      "date": "2026-11-15",
-      "invitationPassage": "詩篇24篇1〜5節",
-      "biblePassage": "エペ5章1〜2節",
+      "date": "2026-11-22",
+      "invitationPassage": "詩篇29篇1〜2節",
+      "biblePassage": "箴言5章3〜6節",
       "hymns": [
-            "33",
-            "138",
-            "402",
-            "658",
-            "377"
+            "497",
+            "56",
+            "435",
+            "489",
+            "376"
       ],
-      "sermonTitle": "神に倣う者となりなさい。",
+      "sermonTitle": "よその女の足は死によみを",
       "preacher": "尹 秉甲師",
-      "mealPrayer": "金理那姉",
+      "mealPrayer": "金素那姉",
       "schedules": [
             {
                   "time": "10:00",
@@ -999,24 +1021,36 @@
 
     function nextSlide() {
       // 手動で次へ送ったときはタイマーをリセットして再カウント
+      keepScreenAwake({ fromUserAction: true });
       showSlide(currentSlide + 1);
       clearInterval(slideInterval);
       slideInterval = setInterval(autoAdvanceSlide, 16000);
     }
 
     let displayStatusTimer;
-    function showDisplayStatus(message) {
+    let displayStatusKind = null;
+    function showDisplayStatus(message, kind = 'general') {
       const status = document.getElementById('displayStatus');
       status.textContent = message;
       status.hidden = false;
+      displayStatusKind = kind;
       clearTimeout(displayStatusTimer);
       displayStatusTimer = setTimeout(() => {
         status.hidden = true;
+        displayStatusKind = null;
       }, 8000);
     }
 
+    function hideDisplayStatus(kind) {
+      if (kind && displayStatusKind !== kind) return;
+      const status = document.getElementById('displayStatus');
+      status.hidden = true;
+      displayStatusKind = null;
+      clearTimeout(displayStatusTimer);
+    }
+
     async function toggleFullscreen() {
-      const wakeLockRequest = keepScreenAwake();
+      const wakeLockRequest = keepScreenAwake({ fromUserAction: true });
       try {
         if (document.fullscreenElement) {
           await document.exitFullscreen();
@@ -1037,29 +1071,118 @@
         document.fullscreenElement ? '全画面解除' : '全画面表示';
     });
 
+    // --- 画面オフ・お休みモード防止（Wake Lock API + 無音ループ動画） ---
     let screenWakeLock = null;
-    async function keepScreenAwake() {
-      if (!navigator.wakeLock) {
-        showDisplayStatus('画面オフ防止に未対応です。Fire TVのスクリーンセーバー設定を「なし」にしてください。');
-        return;
+    let wakeLockPending = null;
+    let keepAwakeVideoStarted = false;
+    let keepAwakeVideoPending = null;
+    const keepAwakeVideo = document.getElementById('keepAwakeVideo');
+
+    async function startKeepAwakeVideo() {
+      if (!keepAwakeVideo) return false;
+      keepAwakeVideo.muted = true;
+      keepAwakeVideo.loop = true;
+      keepAwakeVideo.playsInline = true;
+      if (!keepAwakeVideo.paused && !keepAwakeVideo.ended) {
+        keepAwakeVideoStarted = true;
+        return true;
       }
-      try {
-        const wakeLock = await navigator.wakeLock.request('screen');
-        screenWakeLock = wakeLock;
-        wakeLock.addEventListener('release', () => {
-          if (screenWakeLock === wakeLock) screenWakeLock = null;
-        });
-      } catch (error) {
-        console.error('画面オフ防止を有効にできませんでした。', error);
-        showDisplayStatus('画面オフ防止を有効にできません。Fire TVのスクリーンセーバー設定をご確認ください。');
+      if (keepAwakeVideoPending) return keepAwakeVideoPending;
+      keepAwakeVideoPending = (async () => {
+        try {
+          await keepAwakeVideo.play();
+          keepAwakeVideoStarted = true;
+          return true;
+        } catch (error) {
+          console.warn('お休みモード防止の動画再生を開始できませんでした。', error);
+          return false;
+        } finally {
+          keepAwakeVideoPending = null;
+        }
+      })();
+      return keepAwakeVideoPending;
+    }
+
+    async function requestWakeLock() {
+      if (!navigator.wakeLock) return false;
+      if (screenWakeLock && !screenWakeLock.released) return true;
+      if (wakeLockPending) return wakeLockPending;
+      wakeLockPending = (async () => {
+        try {
+          const wakeLock = await navigator.wakeLock.request('screen');
+          screenWakeLock = wakeLock;
+          wakeLock.addEventListener('release', () => {
+            if (screenWakeLock === wakeLock) screenWakeLock = null;
+          });
+          return true;
+        } catch (error) {
+          console.warn('画面オフ防止（Wake Lock）を有効にできませんでした。', error);
+          return false;
+        } finally {
+          wakeLockPending = null;
+        }
+      })();
+      return wakeLockPending;
+    }
+
+    async function keepScreenAwake(options = {}) {
+      const { fromUserAction = false } = options;
+      const [videoActive, wakeLockActive] = await Promise.all([
+        startKeepAwakeVideo(),
+        requestWakeLock()
+      ]);
+
+      if (videoActive || wakeLockActive) {
+        hideDisplayStatus('keep-awake');
+        return true;
+      }
+
+      if (fromUserAction) {
+        showDisplayStatus(
+          '画面オフ防止を有効にできません。Fire TVのスクリーンセーバー設定を「なし」にしてください。',
+          'keep-awake'
+        );
+      } else {
+        showDisplayStatus(
+          'お休みモード防止を開始するには「全画面表示」ボタンまたは画面を選択してください。',
+          'keep-awake'
+        );
+      }
+      return false;
+    }
+
+    function ensureKeepAwakeOnInteraction() {
+      const videoStopped = !keepAwakeVideo || keepAwakeVideo.paused || keepAwakeVideo.ended;
+      const wakeLockInactive = !screenWakeLock || screenWakeLock.released;
+      if (videoStopped || wakeLockInactive) {
+        keepScreenAwake({ fromUserAction: true });
       }
     }
 
+    ['pointerdown', 'keydown', 'click'].forEach(eventName => {
+      document.addEventListener(eventName, ensureKeepAwakeOnInteraction, { passive: true });
+    });
+
+    if (keepAwakeVideo) {
+      keepAwakeVideo.addEventListener('pause', () => {
+        if (document.visibilityState === 'visible' && keepAwakeVideoStarted) {
+          startKeepAwakeVideo();
+        }
+      });
+    }
+
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && (!screenWakeLock || screenWakeLock.released)) {
+      if (document.visibilityState === 'visible') {
         keepScreenAwake();
       }
     });
+
+    setInterval(() => {
+      if (document.visibilityState === 'visible' && keepAwakeVideoStarted && keepAwakeVideo && keepAwakeVideo.paused) {
+        startKeepAwakeVideo();
+      }
+    }, 60000);
+
     keepScreenAwake();
   </script>
 </body>
